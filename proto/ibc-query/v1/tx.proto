@@ -1,0 +1,58 @@
+syntax = "proto3";
+
+package interchain_queries.ibc_query.v1;
+
+option go_package = "github.com/cosmos/interchain-queries/x/ibc-query/types";
+
+import "gogoproto/gogo.proto";
+import "ibc/core/client/v1/client.proto";
+import "ibc-query/v1/crosschainquery.proto";
+import "proofs.proto";
+
+// Msg
+service Msg {
+  // submit query request
+  rpc SubmitCrossChainQuery(MsgSubmitCrossChainQuery) returns (MsgSubmitCrossChainQueryResponse);
+  // submit query result
+  rpc SubmitCrossChainQueryResult(MsgSubmitCrossChainQueryResult) returns (MsgSubmitCrossChainQueryResultResponse);
+}
+
+// MsgSubmitCrossChainQuery
+message MsgSubmitCrossChainQuery {
+  option (gogoproto.equal)           = false;
+  option (gogoproto.goproto_getters) = false;
+
+  string                    id                   = 1;
+  string                    path                 = 2;
+  ibc.core.client.v1.Height local_timeout_height = 3
+      [(gogoproto.moretags) = "yaml:\"timeout_height\"", (gogoproto.nullable) = false];
+  uint64 local_timeout_stamp = 4;
+  uint64 query_height        = 5;
+  string client_id           = 6;
+  // sender address
+  string sender         = 7;
+  string source_port    = 8;
+  string source_channel = 9;
+}
+
+// MsgSubmitCrossChainQueryResponse
+message MsgSubmitCrossChainQueryResponse {
+  string query_id = 1;
+  uint64 cap_key  = 2;
+}
+
+// MsgSubmitCrossChainQueryResult
+message MsgSubmitCrossChainQueryResult {
+  option (gogoproto.equal)             = false;
+  option (gogoproto.goproto_getters)   = false;
+  string      id                       = 1;
+  string      path                     = 2;
+  uint64      query_height             = 3;
+  QueryResult result                   = 4;
+  bytes       data                     = 5;
+  string      sender                   = 6;
+  repeated ics23.ProofSpec proof_specs = 7; // TODO: Proof specifications used in verifying counterparty state
+}
+
+// MsgSubmitCrossChainQueryResultResponse
+message MsgSubmitCrossChainQueryResultResponse {}

@@ -104,11 +104,11 @@ import (
 	"github.com/ignite/cli/ignite/pkg/cosmoscmd"
 	"github.com/ignite/cli/ignite/pkg/openapiconsole"
 
-	"interchain-queries/docs"
+	"github.com/cosmos/interchain-queries/docs"
 
-	interchainqueriesmodule "interchain-queries/x/interchainqueries"
-	interchainqueriesmodulekeeper "interchain-queries/x/interchainqueries/keeper"
-	interchainqueriesmoduletypes "interchain-queries/x/interchainqueries/types"
+	ibcquery "github.com/cosmos/interchain-queries/x/ibc-query"
+	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc-query/keeper"
+	ibcquerytypes "github.com/cosmos/interchain-queries/x/ibc-query/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
@@ -164,7 +164,7 @@ var (
 		transfer.AppModuleBasic{},
 		ica.AppModuleBasic{},
 		vesting.AppModuleBasic{},
-		interchainqueriesmodule.AppModuleBasic{},
+		ibcquery.AppModuleBasic{},
 		// this line is used by starport scaffolding # stargate/app/moduleBasic
 	)
 
@@ -239,7 +239,7 @@ type App struct {
 	ScopedTransferKeeper capabilitykeeper.ScopedKeeper
 	ScopedICAHostKeeper  capabilitykeeper.ScopedKeeper
 
-	InterchainqueriesKeeper interchainqueriesmodulekeeper.Keeper
+	IBCQueryKeeper ibcquerykeeper.Keeper
 	// this line is used by starport scaffolding # stargate/app/keeperDeclaration
 
 	// mm is the module manager
@@ -277,7 +277,7 @@ func New(
 		minttypes.StoreKey, distrtypes.StoreKey, slashingtypes.StoreKey, govtypes.StoreKey,
 		paramstypes.StoreKey, ibchost.StoreKey, upgradetypes.StoreKey, feegrant.StoreKey, evidencetypes.StoreKey,
 		ibctransfertypes.StoreKey, icahosttypes.StoreKey, capabilitytypes.StoreKey, group.StoreKey,
-		interchainqueriesmoduletypes.StoreKey,
+		ibcquerytypes.StoreKey,
 		// this line is used by starport scaffolding # stargate/app/storeKey
 	)
 	tkeys := sdk.NewTransientStoreKeys(paramstypes.TStoreKey)
@@ -315,6 +315,7 @@ func New(
 	scopedIBCKeeper := app.CapabilityKeeper.ScopeToModule(ibchost.ModuleName)
 	scopedTransferKeeper := app.CapabilityKeeper.ScopeToModule(ibctransfertypes.ModuleName)
 	scopedICAHostKeeper := app.CapabilityKeeper.ScopeToModule(icahosttypes.SubModuleName)
+	scopedIBCQueryKeeper := app.CapabilityKeeper.ScopeToModule(ibcquerytypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/scopedKeeper
 
 	// add keepers
@@ -486,20 +487,21 @@ func New(
 		govConfig,
 	)
 
-	app.InterchainqueriesKeeper = *interchainqueriesmodulekeeper.NewKeeper(
+	app.IBCQueryKeeper = ibcquerykeeper.NewKeeper(
 		appCodec,
-		keys[interchainqueriesmoduletypes.StoreKey],
-		keys[interchainqueriesmoduletypes.MemStoreKey],
-		app.GetSubspace(interchainqueriesmoduletypes.ModuleName),
+		keys[ibcquerytypes.StoreKey],
+		scopedIBCQueryKeeper,
+		app.IBCKeeper.ChannelKeeper, app.IBCKeeper.ChannelKeeper, &app.IBCKeeper.PortKeeper,
 	)
-	interchainqueriesModule := interchainqueriesmodule.NewAppModule(appCodec, app.InterchainqueriesKeeper, app.AccountKeeper, app.BankKeeper)
+	ibcQueryModule := ibcquery.NewIBCModule(app.IBCQueryKeeper)
 
 	// this line is used by starport scaffolding # stargate/app/keeperDefinition
 
 	// Create static IBC router, add transfer route, then set and seal it
 	ibcRouter := ibcporttypes.NewRouter()
 	ibcRouter.AddRoute(icahosttypes.SubModuleName, icaHostIBCModule).
-		AddRoute(ibctransfertypes.ModuleName, transferIBCModule)
+		AddRoute(ibctransfertypes.ModuleName, transferIBCModule).
+		AddRoute(ibcquerytypes.ModuleName, ibcQueryModule)
 	// this line is used by starport scaffolding # ibc/app/router
 	app.IBCKeeper.SetRouter(ibcRouter)
 
@@ -536,7 +538,7 @@ func New(
 		params.NewAppModule(app.ParamsKeeper),
 		transferModule,
 		icaModule,
-		interchainqueriesModule,
+		ibcquery.NewAppModule(&app.IBCQueryKeeper),
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 
@@ -566,7 +568,7 @@ func New(
 		group.ModuleName,
 		paramstypes.ModuleName,
 		vestingtypes.ModuleName,
-		interchainqueriesmoduletypes.ModuleName,
+		ibcquerytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/beginBlockers
 	)
 
@@ -591,7 +593,7 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		interchainqueriesmoduletypes.ModuleName,
+		ibcquerytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/endBlockers
 	)
 
@@ -621,7 +623,7 @@ func New(
 		paramstypes.ModuleName,
 		upgradetypes.ModuleName,
 		vestingtypes.ModuleName,
-		interchainqueriesmoduletypes.ModuleName,
+		ibcquerytypes.ModuleName,
 		// this line is used by starport scaffolding # stargate/app/initGenesis
 	)
 
@@ -651,7 +653,6 @@ func New(
 		evidence.NewAppModule(app.EvidenceKeeper),
 		ibc.NewAppModule(app.IBCKeeper),
 		transferModule,
-		interchainqueriesModule,
 		// this line is used by starport scaffolding # stargate/app/appModule
 	)
 	app.sm.RegisterStoreDecoders()
@@ -852,7 +853,7 @@ func initParamsKeeper(appCodec codec.BinaryCodec, legacyAmino *codec.LegacyAmino
 	paramsKeeper.Subspace(ibctransfertypes.ModuleName)
 	paramsKeeper.Subspace(ibchost.ModuleName)
 	paramsKeeper.Subspace(icahosttypes.SubModuleName)
-	paramsKeeper.Subspace(interchainqueriesmoduletypes.ModuleName)
+	paramsKeeper.Subspace(ibcquerytypes.ModuleName)
 	// this line is used by starport scaffolding # stargate/app/paramSubspace
 
 	return paramsKeeper

@@ -1,10 +1,10 @@
 // THIS FILE IS GENERATED AUTOMATICALLY. DO NOT MODIFY.
 
-import InterchainqueriesInterchainqueries from './interchainqueries.interchainqueries'
+import InterchainQueriesIbcQueryV1 from './interchain_queries.ibc_query.v1'
 
 
 export default { 
-  InterchainqueriesInterchainqueries: load(InterchainqueriesInterchainqueries, 'interchainqueries.interchainqueries'),
+  InterchainQueriesIbcQueryV1: load(InterchainQueriesIbcQueryV1, 'interchain_queries.ibc_query.v1'),
   
 }
 

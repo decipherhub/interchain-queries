@@ -8,6 +8,7 @@
     "@starport/vuex": "^0.3.10",
     "buffer": "^6.0.3",
     "core-js": "^3.18.2",
+    "cosmos-interchain-queries-client-ts": "file:../ts-client",
     "interchain-queries-client-ts": "file:../ts-client",
     "vue": "^3.2.6",
     "vue-router": "^4.0.3",
