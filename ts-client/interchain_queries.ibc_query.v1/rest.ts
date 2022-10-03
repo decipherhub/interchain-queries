@@ -542,7 +542,7 @@ export class HttpClient<SecurityDataType = unknown> {
 }
 
 /**
- * @title ibc-query/v1/crosschainquery.proto
+ * @title ibc_query/v1/crosschainquery.proto
  * @version version not set
  */
 export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDataType> {
@@ -552,7 +552,7 @@ export class Api<SecurityDataType extends unknown> extends HttpClient<SecurityDa
    * @tags Query
    * @name QueryCrossChainQueryResult
    * @summary query CrossChainQueryResult
-   * @request GET:/ibc/apps/ibc-query/v1/{id}
+   * @request GET:/ibc/apps/ibc_query/v1/{id}
    */
   queryCrossChainQueryResult = (id: string, params: RequestParams = {}) =>
     this.request<V1QueryCrossChainQueryResultResponse, RpcStatus>({

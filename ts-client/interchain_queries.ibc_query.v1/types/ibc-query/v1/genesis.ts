@@ -7,7 +7,7 @@ import { Writer, Reader } from "protobufjs/minimal";
 
 export const protobufPackage = "interchain_queries.ibc_query.v1";
 
-/** GenesisState defines the ICS31 ibc-query genesis state */
+/** GenesisState defines the ICS31 ibc_query genesis state */
 export interface GenesisState {
   queries: CrossChainQuery[];
   results: CrossChainQueryResult[];

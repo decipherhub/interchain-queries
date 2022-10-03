@@ -106,9 +106,9 @@ import (
 
 	"github.com/cosmos/interchain-queries/docs"
 
-	ibcquery "github.com/cosmos/interchain-queries/x/ibc-query"
-	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc-query/keeper"
-	ibcquerytypes "github.com/cosmos/interchain-queries/x/ibc-query/types"
+	ibcquery "github.com/cosmos/interchain-queries/x/ibc_query"
+	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc_query/keeper"
+	ibcquerytypes "github.com/cosmos/interchain-queries/x/ibc_query/types"
 	// this line is used by starport scaffolding # stargate/app/moduleImport
 )
 
