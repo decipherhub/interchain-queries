@@ -1,8 +1,6 @@
 package keeper
 
 import (
-	"fmt"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
@@ -74,16 +72,13 @@ func (k Keeper) SetPort(ctx sdk.Context, portID string) {
 	store.Set(types.PortKey, []byte(portID))
 }
 
-func (k Keeper) GenerateQueryIdentifier(ctx sdk.Context) (string, error) {
+func (k Keeper) GenerateQueryIdentifier(ctx sdk.Context) (string) {
 	nextQuerySeq := k.GetNextQuerySequence(ctx)
-	if nextQuerySeq == 0 {
-		return "", fmt.Errorf("next query sequence is nil")
-	}
 	queryID := types.FormatQueryIdentifier(nextQuerySeq)
 
 	nextQuerySeq++
 	k.SetNextQuerySequence(ctx, nextQuerySeq)
-	return queryID, nil
+	return queryID
 }
 
 func (k Keeper) GetNextQuerySequence(ctx sdk.Context) uint64 {
