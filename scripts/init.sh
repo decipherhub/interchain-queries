@@ -23,12 +23,12 @@ interchain-queriesd keys add sangyun --recover < $MNEMONIC_FILE4
 interchain-queriesd keys add soojin --recover < $MNEMONIC_FILE5
 interchain-queriesd keys add wujinger --recover < $MNEMONIC_FILE6
 
-interchain-queriesd add-genesis-account $(iq-chaind keys show genkey -a) 10000000000uiq
-interchain-queriesd add-genesis-account $(iq-chaind keys show relayer -a) 10000000000uiq
-interchain-queriesd add-genesis-account $(iq-chaind keys show boosik -a) 10000000000uiq
-interchain-queriesd add-genesis-account $(iq-chaind keys show sangyun -a) 10000000000uiq
-interchain-queriesd add-genesis-account $(iq-chaind keys show soojin -a) 10000000000uiq
-interchain-queriesd add-genesis-account $(iq-chaind keys show wujinger -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show genkey -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show relayer -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show boosik -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show sangyun -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show soojin -a) 10000000000uiq
+interchain-queriesd add-genesis-account $(interchain-queriesd keys show wujinger -a) 10000000000uiq
 
 interchain-queriesd gentx genkey 1000000000uiq --chain-id $CHAINID
 
