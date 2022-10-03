@@ -52,7 +52,7 @@ func NewMsgCrossChainQueryCmd() *cobra.Command {
 			}
 	
 
-			msg := types.NewMsgSubmitCrossChainQuery("", path, timeoutHeight, timeoutTimestamp, queryHeight, creator, srcPort, srcChannel)
+			msg := types.NewMsgSubmitCrossChainQuery(path, timeoutHeight, timeoutTimestamp, queryHeight, creator, srcPort, srcChannel)
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}

@@ -52,10 +52,10 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	}
 
 	// Log the query request
-	k.Logger(ctx).Info("query sent", "query_id", msg.GetId())
+	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
 
 	// emit event
-	EmitQueryEvent(ctx, msg)
+	EmitQueryEvent(ctx, query)
 
 	return &types.MsgSubmitCrossChainQueryResponse{QueryId: query.Id}, nil
 }

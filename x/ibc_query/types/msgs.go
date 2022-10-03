@@ -2,6 +2,7 @@ package types
 
 import (
 	"encoding/hex"
+
 	ics23 "github.com/confio/ics23/go"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
@@ -13,9 +14,8 @@ const (
 )
 
 // NewMsgSubmitCrossChainQuery creates a new instance of NewMsgSubmitCrossChainQuery
-func NewMsgSubmitCrossChainQuery(id string, path string, localTimeoutHeight clienttypes.Height, localTimeoutStamp uint64, queryHeight uint64, creator string, srcPort string, srcChannel string) *MsgSubmitCrossChainQuery {
+func NewMsgSubmitCrossChainQuery(path string, localTimeoutHeight clienttypes.Height, localTimeoutStamp uint64, queryHeight uint64, creator string, srcPort string, srcChannel string) *MsgSubmitCrossChainQuery {
 	return &MsgSubmitCrossChainQuery{
-		Id:                 id,
 		Path:               path,
 		LocalTimeoutHeight: localTimeoutHeight,
 		LocalTimeoutStamp:  localTimeoutStamp,
@@ -25,8 +25,6 @@ func NewMsgSubmitCrossChainQuery(id string, path string, localTimeoutHeight clie
 		SourceChannel:      srcChannel,
 	}
 }
-
-func (msg MsgSubmitCrossChainQuery) GetId() string { return msg.Id }
 
 func (msg MsgSubmitCrossChainQuery) GetQueryPath() []byte {
 	src := []byte(msg.Path)
