@@ -46,7 +46,7 @@ func (k Keeper) SendQuery(ctx sdk.Context,
 		destinationPort,
 		destinationChannel,
 		clienttypes.NewHeight(0, 100000000000), // not used
-		query.LocalTimeoutTimestamp,
+		0,
 	)
 
 	if err := k.ics4Wrapper.SendPacket(ctx, channelCap, packet); err != nil {
