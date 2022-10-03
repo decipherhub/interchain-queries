@@ -12,6 +12,20 @@ import (
 
 var _ types.QueryServer = Keeper{}
 
+func (k Keeper) CrossChainQuery(c context.Context, req *types.QueryCrossChainQuery) (*types.QueryCrossChainQueryResponse, error) {
+	if req == nil {
+		return nil, status.Error(codes.InvalidArgument, "invalid request")
+	}
+	ctx := sdk.UnwrapSDKContext(c)
+	query, found := k.GetCrossChainQuery(ctx, req.Id)
+	if !found {
+		return nil, sdkerrors.ErrNotFound
+	}
+
+	return &types.QueryCrossChainQueryResponse{Result: &query}, nil
+
+}
+
 // CrossChainQueryResult implements the Query/CrossChainQueryResult gRPC method
 func (k Keeper) CrossChainQueryResult(c context.Context, req *types.QueryCrossChainQueryResult) (*types.QueryCrossChainQueryResultResponse, error) {
 	if req == nil {
