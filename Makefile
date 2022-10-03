@@ -99,6 +99,7 @@ all: build lint test
 install: go.sum
 	go install -mod=readonly $(BUILD_FLAGS) ./cmd/interchain-queriesd
 
+.PHONY: build
 build:
 	go build $(BUILD_FLAGS) -o ./build/interchain-queriesd ./cmd/interchain-queriesd
 
