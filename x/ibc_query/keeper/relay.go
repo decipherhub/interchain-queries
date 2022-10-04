@@ -7,6 +7,7 @@ import (
 	channeltypes "github.com/cosmos/ibc-go/v5/modules/core/04-channel/types"
 	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
 	"github.com/cosmos/interchain-queries/x/ibc_query/types"
+	"math"
 )
 
 func (k Keeper) SendQuery(ctx sdk.Context,
@@ -45,8 +46,8 @@ func (k Keeper) SendQuery(ctx sdk.Context,
 		sourceChannel,
 		destinationPort,
 		destinationChannel,
-		clienttypes.NewHeight(0, 100000000000), // not used
-		0,
+		clienttypes.NewHeight(0, math.MaxUint64),
+		query.LocalTimeoutTimestamp,
 	)
 
 	if err := k.ics4Wrapper.SendPacket(ctx, channelCap, packet); err != nil {
