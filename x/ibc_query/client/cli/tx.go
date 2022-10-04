@@ -20,7 +20,7 @@ func NewMsgCrossChainQueryCmd() *cobra.Command {
 		Long: strings.TrimSpace(`submit an ibc query to queried chain.
 		Timeout height and the timeout stamp are the local timeoutHeight and the local timeoutstamp, respectively, 
 		which are used to validate the query result`),
-		Args: cobra.ExactArgs(6),
+		Args: cobra.ExactArgs(5),
 		RunE: func(cmd *cobra.Command, args []string) error {
 			clientCtx, err := client.GetClientTxContext(cmd)
 			if err != nil {
