@@ -16,6 +16,7 @@ func EmitQueryEvent(ctx sdk.Context, query types.CrossChainQuery) {
 			sdk.NewAttribute(types.AttributeKeyQueryID, query.GetId()),
 			sdk.NewAttribute(types.AttributeKeyQueryHeight, fmt.Sprintf("%d", query.GetQueryHeight())),
 			sdk.NewAttribute(types.AttributeKeyQueryPath, fmt.Sprintf("%x", query.GetPath())),
+			sdk.NewAttribute(types.AttributeKeyChainId, fmt.Sprintf("%x", query.GetChainId())),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

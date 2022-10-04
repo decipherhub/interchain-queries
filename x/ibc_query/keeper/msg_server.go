@@ -42,14 +42,10 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 		LocalTimeoutHeight:    msg.LocalTimeoutHeight,
 		LocalTimeoutTimestamp: msg.LocalTimeoutStamp,
 		QueryHeight:           msg.QueryHeight,
-		ClientId:              msg.Sender,
+		ChainId:               msg.ChainId,
 	}
 
 	k.SetCrossChainQuery(ctx, query)
-
-	if err := k.SendQuery(ctx, msg.SourcePort, msg.SourceChannel, query); err != nil {
-		return nil, err
-	}
 
 	// Log the query request
 	k.Logger(ctx).Info("query sent", "query_id", query.GetId())

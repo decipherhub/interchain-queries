@@ -29,10 +29,7 @@ message QueryCrossChainQuery {
 }
 
 // QueryCrossChainQueryResponse
-message QueryCrossChainQueryResponse {
-  CrossChainQuery result = 1;
-}
-
+message QueryCrossChainQueryResponse { CrossChainQuery result = 1; }
 
 // QueryCrossChainQueryResult
 message QueryCrossChainQueryResult {

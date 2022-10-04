@@ -17,7 +17,7 @@ message CrossChainQuery {
   ];
   uint64 local_timeout_timestamp = 4;
   uint64 query_height = 5;
-  string client_id = 6;
+  string chain_id = 6;
 }
 
 // QueryResult
