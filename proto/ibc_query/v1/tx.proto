@@ -31,11 +31,8 @@ message MsgSubmitCrossChainQuery {
   ];
   uint64 local_timeout_stamp = 3;
   uint64 query_height = 4;
-  string client_id = 5;
-  // sender address
+  string chain_id = 5;
   string sender = 6;
-  string source_port = 7;
-  string source_channel = 8;
 }
 
 // MsgSubmitCrossChainQueryResponse
