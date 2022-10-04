@@ -9,20 +9,38 @@ import "ibc_query/v1/crosschainquery.proto";
 
 // Query
 service Query {
+  // query CrossChainQuery
+  rpc CrossChainQuery(QueryCrossChainQuery)
+      returns (QueryCrossChainQueryResponse) {
+    option (google.api.http).get = "/ibc/apps/ibc_query/v1/{id}";
+  }
+
   // query CrossChainQueryResult
   rpc CrossChainQueryResult(QueryCrossChainQueryResult)
       returns (QueryCrossChainQueryResultResponse) {
-    option (google.api.http).get = "/ibc/apps/ibc_query/v1/{id}";
+    option (google.api.http).get = "/ibc/apps/ibc_query/v1/query_result/{id}";
   }
 }
 
 // QueryCrossChainQuery
-message QueryCrossChainQueryResult {
+message QueryCrossChainQuery {
   // query id
   string id = 1;
 }
 
 // QueryCrossChainQueryResponse
+message QueryCrossChainQueryResponse {
+  CrossChainQuery result = 1;
+}
+
+
+// QueryCrossChainQueryResult
+message QueryCrossChainQueryResult {
+  // query id
+  string id = 1;
+}
+
+// QueryCrossChainQueryResultResponse
 message QueryCrossChainQueryResultResponse {
   string id = 1;
   QueryResult result = 2;

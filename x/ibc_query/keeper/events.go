@@ -9,13 +9,13 @@ import (
 )
 
 // EmitCreateClientEvent emits a create client event
-func EmitQueryEvent(ctx sdk.Context, query *types.MsgSubmitCrossChainQuery) {
+func EmitQueryEvent(ctx sdk.Context, query types.CrossChainQuery) {
 	ctx.EventManager().EmitEvents(sdk.Events{
 		sdk.NewEvent(
 			types.EventSendQuery,
 			sdk.NewAttribute(types.AttributeKeyQueryID, query.GetId()),
 			sdk.NewAttribute(types.AttributeKeyQueryHeight, fmt.Sprintf("%d", query.GetQueryHeight())),
-			sdk.NewAttribute(types.AttributeKeyQueryPath, fmt.Sprintf("%x", query.GetQueryPath())),
+			sdk.NewAttribute(types.AttributeKeyQueryPath, fmt.Sprintf("%x", query.GetPath())),
 		),
 		sdk.NewEvent(
 			sdk.EventTypeMessage,

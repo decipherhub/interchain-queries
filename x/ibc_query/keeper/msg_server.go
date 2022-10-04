@@ -37,7 +37,7 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	// call keeper function
 	// keeper func save query in private store
 	query := types.CrossChainQuery{
-		Id:                    msg.Id,
+		Id:                    k.GenerateQueryIdentifier(ctx),
 		Path:                  msg.Path,
 		LocalTimeoutHeight:    msg.LocalTimeoutHeight,
 		LocalTimeoutTimestamp: msg.LocalTimeoutStamp,
@@ -52,10 +52,10 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	}
 
 	// Log the query request
-	k.Logger(ctx).Info("query sent", "query_id", msg.GetId())
+	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
 
 	// emit event
-	EmitQueryEvent(ctx, msg)
+	EmitQueryEvent(ctx, query)
 
 	return &types.MsgSubmitCrossChainQueryResponse{QueryId: query.Id}, nil
 }
