@@ -17,6 +17,10 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	currentTimestamp := uint64(ctx.BlockTime().UnixNano())
 	currentHeight := clienttypes.GetSelfHeight(ctx)
 
+	if msg.LocalTimeoutHeight.RevisionHeight == 0 && msg.LocalTimeoutStamp == 0 {
+		return nil, types.ErrInvalidQuery
+	}
+
 	// Sanity-check that localTimeoutHeight.
 	if msg.LocalTimeoutHeight.RevisionHeight > 0 && msg.LocalTimeoutHeight.RevisionHeight <= currentHeight.RevisionHeight {
 		return nil, errorsmod.Wrapf(
@@ -75,10 +79,10 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 	// check Timeout by comparing the latest height of chain, latest timestamp
 	selfHeight := clienttypes.GetSelfHeight(ctx)
 	selfBlockTime := uint64(ctx.BlockTime().UnixNano())
-	if selfHeight.GTE(query.LocalTimeoutHeight) {
+	if query.LocalTimeoutHeight.RevisionHeight > 0 && selfHeight.GTE(query.LocalTimeoutHeight) {
 		queryResult.Result = types.QueryResult_QUERY_RESULT_TIMEOUT
 	}
-	if selfBlockTime >= query.LocalTimeoutTimestamp {
+	if query.LocalTimeoutTimestamp > 0 && selfBlockTime >= query.LocalTimeoutTimestamp {
 		queryResult.Result = types.QueryResult_QUERY_RESULT_TIMEOUT
 	}
 
