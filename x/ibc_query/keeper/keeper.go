@@ -5,7 +5,6 @@ import (
 	"github.com/cosmos/cosmos-sdk/store/prefix"
 	storetypes "github.com/cosmos/cosmos-sdk/store/types"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	capabilitykeeper "github.com/cosmos/cosmos-sdk/x/capability/keeper"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	paramtypes "github.com/cosmos/cosmos-sdk/x/params/types"
 	host "github.com/cosmos/ibc-go/v5/modules/core/24-host"
@@ -15,10 +14,10 @@ import (
 
 // Keeper define ibc_query keeper
 type Keeper struct {
-	storeKey     storetypes.StoreKey
-	cdc          codec.BinaryCodec
-	paramSpace   paramtypes.Subspace
-	scopedKeeper capabilitykeeper.ScopedKeeper
+	storeKey      storetypes.StoreKey
+	cdc           codec.BinaryCodec
+	paramSpace    paramtypes.Subspace
+	scopedKeeper  types.ScopedKeeper
 
 	ics4Wrapper   types.ICS4Wrapper
 	channelKeeper types.ChannelKeeper
@@ -28,7 +27,7 @@ type Keeper struct {
 // NewKeeper creates a new ibc_query Keeper instance
 func NewKeeper(cdc codec.BinaryCodec,
 	key storetypes.StoreKey,
-	scopedKeeper capabilitykeeper.ScopedKeeper,
+	scopedKeeper types.ScopedKeeper,
 	ics4Wrapper types.ICS4Wrapper,
 	channelKeeper types.ChannelKeeper,
 	portKeeper types.PortKeeper) Keeper {
