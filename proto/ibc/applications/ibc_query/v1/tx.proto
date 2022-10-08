@@ -6,7 +6,7 @@ option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
 
 import "gogoproto/gogo.proto";
 import "ibc/core/client/v1/client.proto";
-import "ibc_query/v1/crosschainquery.proto";
+import "ibc/applications/ibc_query/v1/crosschainquery.proto";
 import "proofs.proto";
 
 // Msg

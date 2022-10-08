@@ -5,7 +5,7 @@ package ibc.applications.ibc_query.v1;
 option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
 
 import "google/api/annotations.proto";
-import "ibc_query/v1/crosschainquery.proto";
+import "ibc/applications/ibc_query/v1/crosschainquery.proto";
 
 // Query
 service Query {
