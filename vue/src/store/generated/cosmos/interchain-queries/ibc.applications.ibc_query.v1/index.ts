@@ -168,21 +168,6 @@ export default {
 		},
 		
 		
-		async sendMsgSubmitCrossChainQueryResult({ rootGetters }, { value, fee = [], memo = '' }) {
-			try {
-				const txClient=await initTxClient(rootGetters)
-				const msg = await txClient.msgSubmitCrossChainQueryResult(value)
-				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
-	gas: "200000" }, memo})
-				return result
-			} catch (e) {
-				if (e == MissingWalletError) {
-					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Init Could not initialize signing client. Wallet is required.')
-				}else{
-					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Send Could not broadcast Tx: '+ e.message)
-				}
-			}
-		},
 		async sendMsgSubmitCrossChainQuery({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -198,20 +183,22 @@ export default {
 				}
 			}
 		},
-		
-		async MsgSubmitCrossChainQueryResult({ rootGetters }, { value }) {
+		async sendMsgSubmitCrossChainQueryResult({ rootGetters }, { value, fee = [], memo = '' }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
 				const msg = await txClient.msgSubmitCrossChainQueryResult(value)
-				return msg
+				const result = await txClient.signAndBroadcast([msg], {fee: { amount: fee, 
+	gas: "200000" }, memo})
+				return result
 			} catch (e) {
 				if (e == MissingWalletError) {
 					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Init Could not initialize signing client. Wallet is required.')
-				} else{
-					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Create Could not create message: ' + e.message)
+				}else{
+					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Send Could not broadcast Tx: '+ e.message)
 				}
 			}
 		},
+		
 		async MsgSubmitCrossChainQuery({ rootGetters }, { value }) {
 			try {
 				const txClient=await initTxClient(rootGetters)
@@ -222,6 +209,19 @@ export default {
 					throw new Error('TxClient:MsgSubmitCrossChainQuery:Init Could not initialize signing client. Wallet is required.')
 				} else{
 					throw new Error('TxClient:MsgSubmitCrossChainQuery:Create Could not create message: ' + e.message)
+				}
+			}
+		},
+		async MsgSubmitCrossChainQueryResult({ rootGetters }, { value }) {
+			try {
+				const txClient=await initTxClient(rootGetters)
+				const msg = await txClient.msgSubmitCrossChainQueryResult(value)
+				return msg
+			} catch (e) {
+				if (e == MissingWalletError) {
+					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Init Could not initialize signing client. Wallet is required.')
+				} else{
+					throw new Error('TxClient:MsgSubmitCrossChainQueryResult:Create Could not create message: ' + e.message)
 				}
 			}
 		},

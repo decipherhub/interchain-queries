@@ -30,7 +30,6 @@ export interface MsgSubmitCrossChainQueryResponse {
 /** MsgSubmitCrossChainQueryResult */
 export interface MsgSubmitCrossChainQueryResult {
   id: string;
-  path: string;
   query_height: number;
   result: QueryResult;
   data: Uint8Array;
@@ -317,7 +316,6 @@ export const MsgSubmitCrossChainQueryResponse = {
 
 const baseMsgSubmitCrossChainQueryResult: object = {
   id: "",
-  path: "",
   query_height: 0,
   result: 0,
   sender: "",
@@ -331,23 +329,20 @@ export const MsgSubmitCrossChainQueryResult = {
     if (message.id !== "") {
       writer.uint32(10).string(message.id);
     }
-    if (message.path !== "") {
-      writer.uint32(18).string(message.path);
-    }
     if (message.query_height !== 0) {
-      writer.uint32(24).uint64(message.query_height);
+      writer.uint32(16).uint64(message.query_height);
     }
     if (message.result !== 0) {
-      writer.uint32(32).int32(message.result);
+      writer.uint32(24).int32(message.result);
     }
     if (message.data.length !== 0) {
-      writer.uint32(42).bytes(message.data);
+      writer.uint32(34).bytes(message.data);
     }
     if (message.sender !== "") {
-      writer.uint32(50).string(message.sender);
+      writer.uint32(42).string(message.sender);
     }
     for (const v of message.proof_specs) {
-      ProofSpec.encode(v!, writer.uint32(58).fork()).ldelim();
+      ProofSpec.encode(v!, writer.uint32(50).fork()).ldelim();
     }
     return writer;
   },
@@ -369,21 +364,18 @@ export const MsgSubmitCrossChainQueryResult = {
           message.id = reader.string();
           break;
         case 2:
-          message.path = reader.string();
-          break;
-        case 3:
           message.query_height = longToNumber(reader.uint64() as Long);
           break;
-        case 4:
+        case 3:
           message.result = reader.int32() as any;
           break;
-        case 5:
+        case 4:
           message.data = reader.bytes();
           break;
-        case 6:
+        case 5:
           message.sender = reader.string();
           break;
-        case 7:
+        case 6:
           message.proof_specs.push(ProofSpec.decode(reader, reader.uint32()));
           break;
         default:
@@ -403,11 +395,6 @@ export const MsgSubmitCrossChainQueryResult = {
       message.id = String(object.id);
     } else {
       message.id = "";
-    }
-    if (object.path !== undefined && object.path !== null) {
-      message.path = String(object.path);
-    } else {
-      message.path = "";
     }
     if (object.query_height !== undefined && object.query_height !== null) {
       message.query_height = Number(object.query_height);
@@ -438,7 +425,6 @@ export const MsgSubmitCrossChainQueryResult = {
   toJSON(message: MsgSubmitCrossChainQueryResult): unknown {
     const obj: any = {};
     message.id !== undefined && (obj.id = message.id);
-    message.path !== undefined && (obj.path = message.path);
     message.query_height !== undefined &&
       (obj.query_height = message.query_height);
     message.result !== undefined &&
@@ -469,11 +455,6 @@ export const MsgSubmitCrossChainQueryResult = {
       message.id = object.id;
     } else {
       message.id = "";
-    }
-    if (object.path !== undefined && object.path !== null) {
-      message.path = object.path;
-    } else {
-      message.path = "";
     }
     if (object.query_height !== undefined && object.query_height !== null) {
       message.query_height = object.query_height;
