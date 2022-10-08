@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ibc_query.v1;
+package ibc.applications.ibc_query.v1;
 
 import "gogoproto/gogo.proto";
 import "ibc_query/v1/crosschainquery.proto";

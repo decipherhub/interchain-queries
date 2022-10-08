@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-package ibc_query.v1;
+package ibc.applications.ibc_query.v1;
 
 option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
 
