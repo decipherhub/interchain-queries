@@ -2,14 +2,12 @@ package keeper
 
 import (
 	"context"
-
+	errorsmod "cosmossdk.io/errors"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	"github.com/cosmos/interchain-queries/x/ibc_query/types"
 )
-
-//var _ types.MsgServer = Keeper{}
 
 // SubmitCrossChainQuery Handling SubmitCrossChainQuery transaction
 func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmitCrossChainQuery) (*types.MsgSubmitCrossChainQueryResponse, error) {
@@ -21,14 +19,14 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 
 	// Sanity-check that localTimeoutHeight.
 	if msg.LocalTimeoutHeight.RevisionHeight > 0 && msg.LocalTimeoutHeight.RevisionHeight <= currentHeight.RevisionHeight {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrTimeout,
 			"localTimeoutHeight > 0 and current height >= localTimeoutHeight(%d >= %d)", currentHeight.RevisionHeight, msg.LocalTimeoutHeight.RevisionHeight,
 		)
 	}
 	// Sanity-check that localTimeoutTimestamp
 	if msg.LocalTimeoutStamp > 0 && msg.LocalTimeoutStamp <= currentTimestamp {
-		return nil, sdkerrors.Wrapf(
+		return nil, errorsmod.Wrapf(
 			types.ErrTimeout,
 			"localTimeoutTimestamp > 0 and current timestamp >= localTimeoutTimestamp(%d >= %d)", currentTimestamp, msg.LocalTimeoutStamp,
 		)
@@ -53,7 +51,7 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	// emit event
 	EmitQueryEvent(ctx, query)
 
-	return &types.MsgSubmitCrossChainQueryResponse{QueryId: query.Id}, nil
+	return &types.MsgSubmitCrossChainQueryResponse{Id: query.Id}, nil
 }
 
 func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.MsgSubmitCrossChainQueryResult) (*types.MsgSubmitCrossChainQueryResultResponse, error) {
@@ -69,7 +67,7 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 	query, found := k.GetCrossChainQuery(ctx, queryResult.Id)
 	// if CrossChainQuery of queryId doesn't exist in store, other relayer already submitted CrossChainQueryResult
 	if !found {
-		return nil, sdkerrors.Wrapf(types.ErrCrossChainQueryNotFound, "cannot find ICS-31 cross chain query id %s", queryResult.Id)
+		return nil, types.ErrCrossChainQueryNotFound
 	}
 
 	k.DeleteCrossChainQuery(ctx, queryResult.Id)
@@ -88,4 +86,23 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 	k.SetCrossChainQueryResult(ctx, queryResult)
 
 	return &types.MsgSubmitCrossChainQueryResultResponse{}, nil
+}
+
+// SubmitPruneCrossChainQueryResult Handling SubmitPruneCrossChainQueryResult transaction
+func (k Keeper) SubmitPruneCrossChainQueryResult(goCtx context.Context, msg *types.MsgSubmitPruneCrossChainQueryResult) (*types.MsgSubmitPruneCrossChainQueryResultResponse, error) {
+	// UnwrapSDKContext
+	ctx := sdk.UnwrapSDKContext(goCtx)
+
+	queryResult, found := k.GetCrossChainQueryResult(ctx, msg.Id)
+	if !found {
+		return nil, sdkerrors.ErrNotFound
+	}
+
+	if !k.scopedKeeper.AuthenticateCapability(ctx, msg.CapKey, msg.Id) {
+		return nil, types.ErrInvalidCapability
+	}
+
+	k.DeleteCrossChainQueryResult(ctx, queryResult.Id)
+
+	return &types.MsgSubmitPruneCrossChainQueryResultResponse{Id: queryResult.Id}, nil
 }

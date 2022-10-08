@@ -7,6 +7,7 @@ option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
 import "gogoproto/gogo.proto";
 import "ibc/core/client/v1/client.proto";
 import "ibc_query/v1/crosschainquery.proto";
+import "cosmos/capability/v1beta1/capability.proto";
 import "proofs.proto";
 
 // Msg
@@ -17,6 +18,9 @@ service Msg {
   // submit query result
   rpc SubmitCrossChainQueryResult(MsgSubmitCrossChainQueryResult)
       returns (MsgSubmitCrossChainQueryResultResponse);
+  // retrieve the result and delete it
+  rpc SubmitPruneCrossChainQueryResult(MsgSubmitPruneCrossChainQueryResult)
+      returns (MsgSubmitPruneCrossChainQueryResultResponse);
 }
 
 // MsgSubmitCrossChainQuery
@@ -37,8 +41,8 @@ message MsgSubmitCrossChainQuery {
 
 // MsgSubmitCrossChainQueryResponse
 message MsgSubmitCrossChainQueryResponse {
-  string query_id = 1;
-  uint64 cap_key = 2;
+  string id = 1;
+  cosmos.capability.v1beta1.Capability cap_key = 2;
 }
 
 // MsgSubmitCrossChainQueryResult
@@ -57,3 +61,16 @@ message MsgSubmitCrossChainQueryResult {
 
 // MsgSubmitCrossChainQueryResultResponse
 message MsgSubmitCrossChainQueryResultResponse {}
+
+// MsgSubmitPruneCrossChainQueryResult
+message MsgSubmitPruneCrossChainQueryResult {
+  string id = 1;
+  cosmos.capability.v1beta1.Capability cap_key = 2;
+}
+
+// MsgSubmitPruneCrossChainQueryResultResponse
+message MsgSubmitPruneCrossChainQueryResultResponse {
+  string id = 1;
+  QueryResult result = 2;
+  bytes data = 3;
+}

@@ -14,10 +14,10 @@ import (
 
 // Keeper define ibc_query keeper
 type Keeper struct {
-	storeKey      storetypes.StoreKey
-	cdc           codec.BinaryCodec
-	paramSpace    paramtypes.Subspace
-	scopedKeeper  types.ScopedKeeper
+	storeKey     storetypes.StoreKey
+	cdc          codec.BinaryCodec
+	paramSpace   paramtypes.Subspace
+	scopedKeeper types.ScopedKeeper
 
 	ics4Wrapper   types.ICS4Wrapper
 	channelKeeper types.ChannelKeeper
@@ -71,7 +71,7 @@ func (k Keeper) SetPort(ctx sdk.Context, portID string) {
 	store.Set(types.PortKey, []byte(portID))
 }
 
-func (k Keeper) GenerateQueryIdentifier(ctx sdk.Context) (string) {
+func (k Keeper) GenerateQueryIdentifier(ctx sdk.Context) string {
 	nextQuerySeq := k.GetNextQuerySequence(ctx)
 	queryID := types.FormatQueryIdentifier(nextQuerySeq)
 
@@ -136,11 +136,6 @@ func (k Keeper) DeleteCrossChainQuery(ctx sdk.Context, queryId string) {
 	store := prefix.NewStore(ctx.KVStore(k.storeKey), types.QueryKey)
 	store.Delete([]byte(queryId))
 }
-
-// TODO
-// func handleIbcQueryResult
-// 1. relayer should be call this func with query result
-// 2. save query in private store
 
 // SetCrossChainQueryResult stores the CrossChainQueryResult in state keyed by the query id
 func (k Keeper) SetCrossChainQueryResult(ctx sdk.Context, result types.CrossChainQueryResult) {

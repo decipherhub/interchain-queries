@@ -1,15 +1,16 @@
 package types
 
 import (
-	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
+	errorsmod "cosmossdk.io/errors"
 )
 
 // ibc_query sentinel errors
 var (
-	ErrInvalidVersion          = sdkerrors.Register(ModuleName, 2, "invalid 31-IBC-query version")
-	ErrInvalidQuery            = sdkerrors.Register(ModuleName, 3, "invalid cross chain query")
-	ErrTimeout                 = sdkerrors.Register(ModuleName, 4, "cross chain query timeout")
-	ErrCrossChainQueryNotFound = sdkerrors.Register(ModuleName, 5, "no query found for given query id")
-	ErrMaxTransferChannels     = sdkerrors.Register(ModuleName, 6, "max transfer channels")
-	ErrUnknownDataType         = sdkerrors.Register(ModuleName, 7, "unknown data type")
+	ErrInvalidVersion          = errorsmod.Register(ModuleName, 2, "invalid 31-IBC-query version")
+	ErrInvalidQuery            = errorsmod.Register(ModuleName, 3, "invalid cross chain query")
+	ErrTimeout                 = errorsmod.Register(ModuleName, 4, "cross chain query timeout")
+	ErrCrossChainQueryNotFound = errorsmod.Register(ModuleName, 5, "no query found for given query id")
+	ErrMaxTransferChannels     = errorsmod.Register(ModuleName, 6, "max transfer channels")
+	ErrUnknownDataType         = errorsmod.Register(ModuleName, 7, "unknown data type")
+	ErrInvalidCapability       = errorsmod.Register(ModuleName, 8, "invalid capability")
 )
