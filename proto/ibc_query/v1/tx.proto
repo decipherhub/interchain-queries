@@ -46,13 +46,12 @@ message MsgSubmitCrossChainQueryResult {
   option (gogoproto.equal) = false;
   option (gogoproto.goproto_getters) = false;
   string id = 1;
-  string path = 2;
-  uint64 query_height = 3;
-  QueryResult result = 4;
-  bytes data = 5;
-  string sender = 6;
+  uint64 query_height = 2;
+  QueryResult result = 3;
+  bytes data = 4;
+  string sender = 5;
   repeated ics23.ProofSpec proof_specs =
-      7; // TODO: Proof specifications used in verifying counterparty state
+      6; // TODO: Proof specifications used in verifying counterparty state
 }
 
 // MsgSubmitCrossChainQueryResultResponse
