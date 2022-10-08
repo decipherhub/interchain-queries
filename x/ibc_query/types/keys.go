@@ -22,6 +22,7 @@ const (
 
 	KeyNextQuerySequence = "nextQuerySequence"
 	QueryPrefix          = "query-"
+	MemStoreKey          = "mem_ibc_query"
 )
 
 var (
