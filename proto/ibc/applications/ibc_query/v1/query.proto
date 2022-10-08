@@ -1,0 +1,45 @@
+syntax = "proto3";
+
+package ibc.applications.ibc_query.v1;
+
+option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
+
+import "google/api/annotations.proto";
+import "ibc/applications/ibc_query/v1/crosschainquery.proto";
+
+// Query
+service Query {
+  // query CrossChainQuery
+  rpc CrossChainQuery(QueryCrossChainQuery)
+      returns (QueryCrossChainQueryResponse) {
+    option (google.api.http).get = "/ibc/apps/ibc_query/v1/{id}";
+  }
+
+  // query CrossChainQueryResult
+  rpc CrossChainQueryResult(QueryCrossChainQueryResult)
+      returns (QueryCrossChainQueryResultResponse) {
+    option (google.api.http).get = "/ibc/apps/ibc_query/v1/query_result/{id}";
+  }
+}
+
+// QueryCrossChainQuery
+message QueryCrossChainQuery {
+  // query id
+  string id = 1;
+}
+
+// QueryCrossChainQueryResponse
+message QueryCrossChainQueryResponse { CrossChainQuery result = 1; }
+
+// QueryCrossChainQueryResult
+message QueryCrossChainQueryResult {
+  // query id
+  string id = 1;
+}
+
+// QueryCrossChainQueryResultResponse
+message QueryCrossChainQueryResultResponse {
+  string id = 1;
+  QueryResult result = 2;
+  bytes data = 3;
+}

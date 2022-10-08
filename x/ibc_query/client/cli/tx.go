@@ -15,7 +15,7 @@ import (
 
 func NewMsgCrossChainQueryCmd() *cobra.Command {
 	cmd := &cobra.Command{
-		Use:   "ibc-query [query-path] [query-height] [chain-id] [timeout-timeheight] [timeout-timestamp]",
+		Use:   "query [query-path] [query-height] [chain-id] [timeout-timeheight] [timeout-timestamp]",
 		Short: "submit an ibc query",
 		Long: strings.TrimSpace(`submit an ibc query to queried chain.
 		Timeout height and the timeout stamp are the local timeoutHeight and the local timeoutstamp, respectively, 
