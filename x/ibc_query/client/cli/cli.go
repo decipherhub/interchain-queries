@@ -34,6 +34,7 @@ func NewTxCmd() *cobra.Command {
 
 	txCmd.AddCommand(
 		NewMsgCrossChainQueryCmd(),
+		NewMsgPruneCrossChainQueryResultCmd(),
 	)
 
 	return txCmd

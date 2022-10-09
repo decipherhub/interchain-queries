@@ -5,12 +5,14 @@ import (
 
 	ics23 "github.com/confio/ics23/go"
 	sdk "github.com/cosmos/cosmos-sdk/types"
+	captypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 )
 
 const (
-	TypeMsgSubmitCrossChainQuery       = "submitCrossChainQuery"
-	TypeMsgSubmitCrossChainQueryResult = "submitCrossChainQueryResult"
+	TypeMsgSubmitCrossChainQuery            = "submitCrossChainQuery"
+	TypeMsgSubmitCrossChainQueryResult      = "submitCrossChainQueryResult"
+	TypeMsgSubmitPruneCrossChainQueryResult = "submitPruneCrossChainQueryResult"
 )
 
 // NewMsgSubmitCrossChainQuery creates a new instance of NewMsgSubmitCrossChainQuery
@@ -115,10 +117,49 @@ func (msg MsgSubmitCrossChainQueryResult) Route() string {
 
 // Type implements sdk.Msg
 func (msg MsgSubmitCrossChainQueryResult) Type() string {
-	return TypeMsgSubmitCrossChainQuery
+	return TypeMsgSubmitCrossChainQueryResult
 }
 
 // GetSignBytes implements sdk.Msg.
 func (msg MsgSubmitCrossChainQueryResult) GetSignBytes() []byte {
+	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
+}
+
+// NewMsgSubmitPruneCrossChainQueryResult creates a new instance of MsgSubmitPruneCrossChainQueryResult
+func NewMsgSubmitPruneCrossChainQueryResult(id string, capKey *captypes.Capability, sender string) *MsgSubmitPruneCrossChainQueryResult {
+	return &MsgSubmitPruneCrossChainQueryResult{
+		Id:     id,
+		CapKey: capKey,
+		Sender: sender,
+	}
+}
+
+// ValidateBasic implements sdk.Msg and performs basic stateless validation
+func (msg MsgSubmitPruneCrossChainQueryResult) ValidateBasic() error {
+	return nil
+}
+
+// GetSigners implements sdk.Msg
+func (msg MsgSubmitPruneCrossChainQueryResult) GetSigners() []sdk.AccAddress {
+	signer, err := sdk.AccAddressFromBech32(msg.Sender)
+	if err != nil {
+		panic(err)
+	}
+
+	return []sdk.AccAddress{signer}
+}
+
+// Route implements sdk.Msg
+func (msg MsgSubmitPruneCrossChainQueryResult) Route() string {
+	return RouterKey
+}
+
+// Type implements sdk.Msg
+func (msg MsgSubmitPruneCrossChainQueryResult) Type() string {
+	return TypeMsgSubmitPruneCrossChainQueryResult
+}
+
+// GetSignBytes implements sdk.Msg.
+func (msg MsgSubmitPruneCrossChainQueryResult) GetSignBytes() []byte {
 	return sdk.MustSortJSON(AminoCdc.MustMarshalJSON(&msg))
 }
