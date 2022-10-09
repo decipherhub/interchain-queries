@@ -9,6 +9,7 @@ import (
 	"github.com/spf13/cast"
 	"github.com/spf13/cobra"
 
+	captypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	"github.com/cosmos/interchain-queries/x/ibc_query/types"
 )
@@ -46,6 +47,35 @@ func NewMsgCrossChainQueryCmd() *cobra.Command {
 			}
 
 			msg := types.NewMsgSubmitCrossChainQuery(path, timeoutHeight, timeoutTimestamp, queryHeight, chainId, creator)
+			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
+		},
+	}
+
+	flags.AddTxFlagsToCmd(cmd)
+
+	return cmd
+}
+
+func NewMsgPruneCrossChainQueryResultCmd() *cobra.Command {
+	cmd := &cobra.Command{
+		Use:   "prune [query-id] [capability-key]",
+		Short: "prune ibc query result",
+		Long:  strings.TrimSpace(`prune ibc query result`),
+		Args:  cobra.ExactArgs(2),
+		RunE: func(cmd *cobra.Command, args []string) error {
+			clientCtx, err := client.GetClientTxContext(cmd)
+			if err != nil {
+				return err
+			}
+
+			creator := clientCtx.GetFromAddress().String()
+			queryId := args[0]
+			capKeyIndex, err := cast.ToUint64E(args[1])
+			if err != nil {
+				return err
+			}
+			capKey := captypes.NewCapability(capKeyIndex)
+			msg := types.NewMsgSubmitPruneCrossChainQueryResult(queryId, capKey, creator)
 			return tx.GenerateOrBroadcastTxCLI(clientCtx, cmd.Flags(), msg)
 		},
 	}
