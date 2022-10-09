@@ -69163,6 +69163,15 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
     description: Period defines a length of time and amount of coins that will vest.
+  cosmos.capability.v1beta1.Capability:
+    type: object
+    properties:
+      index:
+        type: string
+        format: uint64
+    description: |-
+      Capability defines an implementation of an object capability. The index
+      provided to a Capability must be globally unique.
   ibc.applications.ibc_query.v1.CrossChainQuery:
     type: object
     properties:
@@ -69216,15 +69225,46 @@ definitions:
   ibc.applications.ibc_query.v1.MsgSubmitCrossChainQueryResponse:
     type: object
     properties:
-      query_id:
+      id:
         type: string
       cap_key:
-        type: string
-        format: uint64
+        type: object
+        properties:
+          index:
+            type: string
+            format: uint64
+        description: >-
+          Capability defines an implementation of an object capability. The
+          index
+
+          provided to a Capability must be globally unique.
     title: MsgSubmitCrossChainQueryResponse
   ibc.applications.ibc_query.v1.MsgSubmitCrossChainQueryResultResponse:
     type: object
     title: MsgSubmitCrossChainQueryResultResponse
+  ibc.applications.ibc_query.v1.MsgSubmitPruneCrossChainQueryResultResponse:
+    type: object
+    properties:
+      id:
+        type: string
+      result:
+        type: string
+        enum:
+          - QUERY_RESULT_UNSPECIFIED
+          - QUERY_RESULT_SUCCESS
+          - QUERY_RESULT_FAILURE
+          - QUERY_RESULT_TIMEOUT
+        default: QUERY_RESULT_UNSPECIFIED
+        description: |-
+          - QUERY_RESULT_UNSPECIFIED: UNSPECIFIED
+           - QUERY_RESULT_SUCCESS: SUCCESS
+           - QUERY_RESULT_FAILURE: FAILURE
+           - QUERY_RESULT_TIMEOUT: TIMEOUT
+        title: QueryResult
+      data:
+        type: string
+        format: byte
+    title: MsgSubmitPruneCrossChainQueryResultResponse
   ibc.applications.ibc_query.v1.QueryCrossChainQueryResponse:
     type: object
     properties:
