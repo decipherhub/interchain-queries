@@ -1,0 +1,15 @@
+syntax = "proto3";
+
+package ibc.applications.ibc_query.v1;
+
+import "gogoproto/gogo.proto";
+import "ibc/applications/ibc_query/v1/crosschainquery.proto";
+
+option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
+
+// GenesisState defines the ICS31 ibc-query genesis state
+message GenesisState {
+  repeated CrossChainQuery queries = 1;
+  repeated CrossChainQueryResult results = 2;
+  string port_id = 3 [ (gogoproto.moretags) = "yaml:\"port_id\"" ];
+}

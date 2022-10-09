@@ -1,0 +1,40 @@
+syntax = "proto3";
+
+package ibc.applications.ibc_query.v1;
+
+import "gogoproto/gogo.proto";
+import "ibc/core/client/v1/client.proto";
+
+option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
+
+// CrossChainQuery
+message CrossChainQuery {
+  string id = 1;
+  string path = 2;
+  ibc.core.client.v1.Height local_timeout_height = 3 [
+    (gogoproto.moretags) = "yaml:\"timeout_height\"",
+    (gogoproto.nullable) = false
+  ];
+  uint64 local_timeout_timestamp = 4;
+  uint64 query_height = 5;
+  string chain_id = 6;
+}
+
+// QueryResult
+enum QueryResult {
+  // UNSPECIFIED
+  QUERY_RESULT_UNSPECIFIED = 0;
+  // SUCCESS
+  QUERY_RESULT_SUCCESS = 1;
+  // FAILURE
+  QUERY_RESULT_FAILURE = 2;
+  // TIMEOUT
+  QUERY_RESULT_TIMEOUT = 3;
+}
+
+// CrossChainQueryResult
+message CrossChainQueryResult {
+  string id = 1;
+  QueryResult result = 2;
+  bytes data = 3;
+}

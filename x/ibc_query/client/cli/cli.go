@@ -8,7 +8,7 @@ import (
 // GetQueryCmd returns the query commands for ibc_query
 func GetQueryCmd() *cobra.Command {
 	queryCmd := &cobra.Command{
-		Use:                        "ibc_query",
+		Use:                        "ibc-query",
 		Short:                      "IBC query command",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
@@ -25,7 +25,7 @@ func GetQueryCmd() *cobra.Command {
 // NewTxCmd returns the transaction commands for ibc_query
 func NewTxCmd() *cobra.Command {
 	txCmd := &cobra.Command{
-		Use:                        "ibc_query",
+		Use:                        "ibc-query",
 		Short:                      "Query cross chain query result",
 		DisableFlagParsing:         true,
 		SuggestionsMinimumDistance: 2,
