@@ -13,4 +13,5 @@ var (
 	ErrMaxTransferChannels     = errorsmod.Register(ModuleName, 6, "max transfer channels")
 	ErrUnknownDataType         = errorsmod.Register(ModuleName, 7, "unknown data type")
 	ErrInvalidCapability       = errorsmod.Register(ModuleName, 8, "invalid capability")
+	ErrNotFoundCapability      = errorsmod.Register(ModuleName, 9, "not found capability")
 )
