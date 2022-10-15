@@ -15,6 +15,7 @@ MNEMONIC_FILE6=mnemonic6.txt
 interchain-queriesd init $MONIKER --chain-id $CHAINID
 
 interchain-queriesd config keyring-backend $KEYRING
+interchain-queriesd config broadcast-mode block
 
 interchain-queriesd keys add genkey --recover < $MNEMONIC_FILE1
 interchain-queriesd keys add relayer --recover < $MNEMONIC_FILE2
