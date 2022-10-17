@@ -106,6 +106,7 @@ import (
 
 	"github.com/cosmos/interchain-queries/docs"
 
+	ibctestingtypes "github.com/cosmos/ibc-go/v5/testing/types"
 	ibcquery "github.com/cosmos/interchain-queries/x/ibc_query"
 	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc_query/keeper"
 	ibcquerytypes "github.com/cosmos/interchain-queries/x/ibc_query/types"
@@ -827,6 +828,28 @@ func (app *App) RegisterTendermintService(clientCtx client.Context) {
 		app.interfaceRegistry,
 		app.Query,
 	)
+}
+
+// TestingApp functions
+
+// GetStakingKeeper implements the TestingApp interface.
+func (app *App) GetStakingKeeper() ibctestingtypes.StakingKeeper {
+	return app.StakingKeeper
+}
+
+// GetIBCKeeper implements the TestingApp interface.
+func (app *App) GetIBCKeeper() *ibckeeper.Keeper {
+	return app.IBCKeeper
+}
+
+// GetScopedIBCKeeper implements the TestingApp interface.
+func (app *App) GetScopedIBCKeeper() capabilitykeeper.ScopedKeeper {
+	return app.ScopedIBCKeeper
+}
+
+// GetTxConfig implements the TestingApp interface.
+func (app *App) GetTxConfig() client.TxConfig {
+	return cosmoscmd.MakeEncodingConfig(ModuleBasics).TxConfig
 }
 
 // GetMaccPerms returns a copy of the module account permissions
