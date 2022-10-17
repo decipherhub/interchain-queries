@@ -5,7 +5,6 @@ import (
 
 	ics23 "github.com/confio/ics23/go"
 	sdk "github.com/cosmos/cosmos-sdk/types"
-	captypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 )
 
@@ -126,10 +125,9 @@ func (msg MsgSubmitCrossChainQueryResult) GetSignBytes() []byte {
 }
 
 // NewMsgSubmitPruneCrossChainQueryResult creates a new instance of MsgSubmitPruneCrossChainQueryResult
-func NewMsgSubmitPruneCrossChainQueryResult(id string, capKey *captypes.Capability, sender string) *MsgSubmitPruneCrossChainQueryResult {
+func NewMsgSubmitPruneCrossChainQueryResult(id string, sender string) *MsgSubmitPruneCrossChainQueryResult {
 	return &MsgSubmitPruneCrossChainQueryResult{
 		Id:     id,
-		CapKey: capKey,
 		Sender: sender,
 	}
 }

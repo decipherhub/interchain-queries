@@ -42,7 +42,7 @@ message MsgSubmitCrossChainQuery {
 // MsgSubmitCrossChainQueryResponse
 message MsgSubmitCrossChainQueryResponse {
   string id = 1;
-  cosmos.capability.v1beta1.Capability cap_key = 2;
+  string cap_key = 2;
 }
 
 // MsgSubmitCrossChainQueryResult
@@ -64,8 +64,7 @@ message MsgSubmitCrossChainQueryResultResponse {}
 // MsgSubmitPruneCrossChainQueryResult
 message MsgSubmitPruneCrossChainQueryResult {
   string id = 1;
-  cosmos.capability.v1beta1.Capability cap_key = 2;
-  string sender = 3;
+  string sender = 2;
 }
 
 // MsgSubmitPruneCrossChainQueryResultResponse

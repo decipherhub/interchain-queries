@@ -37,3 +37,7 @@ var (
 func FormatQueryIdentifier(sequence uint64) string {
 	return fmt.Sprintf("%s%d", QueryPrefix, sequence)
 }
+
+func FormatQueryCapabilityIdentifier(queryID string, sender string) string {
+	return fmt.Sprintf("%s-%s", queryID, sender)
+}
