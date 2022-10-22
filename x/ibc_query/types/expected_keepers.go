@@ -35,6 +35,7 @@ type PortKeeper interface {
 }
 
 type ScopedKeeper interface {
+	NewCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, error)
 	GetCapability(ctx sdk.Context, name string) (*capabilitytypes.Capability, bool)
 	AuthenticateCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) bool
 	ClaimCapability(ctx sdk.Context, cap *capabilitytypes.Capability, name string) error

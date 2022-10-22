@@ -80,6 +80,11 @@ func (k Keeper) GenerateQueryIdentifier(ctx sdk.Context) string {
 	return queryID
 }
 
+func (k Keeper) GenerateQueryCapabilityIdentifier(queryID string, sender string) string {
+	capabilityID := types.FormatQueryCapabilityIdentifier(queryID, sender)
+	return capabilityID
+}
+
 func (k Keeper) GetNextQuerySequence(ctx sdk.Context) uint64 {
 	store := ctx.KVStore(k.storeKey)
 	bz := store.Get([]byte(types.KeyNextQuerySequence))
