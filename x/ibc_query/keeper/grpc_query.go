@@ -17,7 +17,7 @@ func (k Keeper) CrossChainQuery(c context.Context, req *types.QueryCrossChainQue
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	query, found := k.GetCrossChainQuery(ctx, req.Id)
+	query, found := k.GetCrossChainQuery(ctx, types.QueryPath(req.Id))
 	if !found {
 		return nil, sdkerrors.ErrNotFound
 	}
@@ -32,7 +32,7 @@ func (k Keeper) CrossChainQueryResult(c context.Context, req *types.QueryCrossCh
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 	ctx := sdk.UnwrapSDKContext(c)
-	queryResult, found := k.GetCrossChainQueryResult(ctx, req.Id)
+	queryResult, found := k.GetCrossChainQueryResult(ctx, types.ResultQueryPath(req.Id))
 	if !found {
 		return nil, sdkerrors.ErrNotFound
 	}
