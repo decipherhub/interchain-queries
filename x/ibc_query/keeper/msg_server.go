@@ -50,7 +50,7 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 		ChainId:               msg.ChainId,
 	}
 
-	k.SetCrossChainQuery(ctx, query)
+	k.SetCrossChainQuery(ctx, types.QueryPath(query.Id), query)
 
 	// Log the query request
 	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
@@ -76,13 +76,13 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 		Data:   msg.Data,
 	}
 
-	query, found := k.GetCrossChainQuery(ctx, queryResult.Id)
+	query, found := k.GetCrossChainQuery(ctx, types.QueryPath(queryResult.Id))
 	// if CrossChainQuery of queryId doesn't exist in store, other relayer already submitted CrossChainQueryResult
 	if !found {
 		return nil, types.ErrCrossChainQueryNotFound
 	}
 
-	k.DeleteCrossChainQuery(ctx, queryResult.Id)
+	k.DeleteCrossChainQuery(ctx, types.QueryPath(queryResult.Id))
 
 	// check Timeout by comparing the latest height of chain, latest timestamp
 	selfHeight := clienttypes.GetSelfHeight(ctx)
@@ -95,7 +95,7 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 	}
 
 	// store result in privateStore
-	k.SetCrossChainQueryResult(ctx, queryResult)
+	k.SetCrossChainQueryResult(ctx, types.ResultQueryPath(queryResult.Id), queryResult)
 
 	return &types.MsgSubmitCrossChainQueryResultResponse{}, nil
 }
@@ -105,7 +105,7 @@ func (k Keeper) SubmitPruneCrossChainQueryResult(goCtx context.Context, msg *typ
 	// UnwrapSDKContext
 	ctx := sdk.UnwrapSDKContext(goCtx)
 
-	queryResult, found := k.GetCrossChainQueryResult(ctx, msg.Id)
+	queryResult, found := k.GetCrossChainQueryResult(ctx, types.ResultQueryPath(msg.Id))
 	if !found {
 		return nil, sdkerrors.ErrNotFound
 	}
@@ -120,7 +120,7 @@ func (k Keeper) SubmitPruneCrossChainQueryResult(goCtx context.Context, msg *typ
 		return nil, types.ErrInvalidCapability
 	}
 
-	k.DeleteCrossChainQueryResult(ctx, queryResult.Id)
+	k.DeleteCrossChainQueryResult(ctx, types.ResultQueryPath(queryResult.Id))
 
 	return &types.MsgSubmitPruneCrossChainQueryResultResponse{Id: queryResult.Id, Result: queryResult.Result, Data: queryResult.Data}, nil
 }
