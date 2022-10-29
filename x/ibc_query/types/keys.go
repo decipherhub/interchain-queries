@@ -41,3 +41,11 @@ func FormatQueryIdentifier(sequence uint64) string {
 func FormatQueryCapabilityIdentifier(queryID string, sender string) string {
 	return fmt.Sprintf("%s-%s", queryID, sender)
 }
+
+func QueryPath(queryID string) string {
+    return  fmt.Sprint("queries/", queryID)
+}
+
+func ResultQueryPath(queryID string) string {
+    return fmt.Sprint("queriesresult/", queryID)
+}

@@ -11,10 +11,10 @@ import (
 func (k Keeper) InitGenesis(ctx sdk.Context, state types.GenesisState) {
 	k.SetPort(ctx, state.PortId)
 	for _, query := range state.Queries {
-		k.SetCrossChainQuery(ctx, *query)
+		k.SetCrossChainQuery(ctx, types.QueryPath(query.Id), *query)
 	}
 	for _, result := range state.Results {
-		k.SetCrossChainQueryResult(ctx, *result)
+		k.SetCrossChainQueryResult(ctx, types.ResultQueryPath(result.Id), *result)
 	}
 
 	if !k.IsBound(ctx, state.PortId) {
