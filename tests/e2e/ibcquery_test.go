@@ -1,73 +1,75 @@
 package e2e
 
 import (
-	captypes "github.com/cosmos/cosmos-sdk/x/capability/types"
-	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
-	testing "github.com/cosmos/ibc-go/v5/testing"
-	banktypes "github.com/cosmos/cosmos-sdk/x/bank/types"
-	"github.com/cosmos/interchain-queries/app"
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
+	cosmostypes "github.com/cosmos/cosmos-sdk/types"
 	"github.com/cosmos/interchain-queries/x/ibc_query/types"
-	"time"
+	"github.com/stretchr/testify/suite"
+	"strconv"
+	"testing"
 )
 
 type testIBCQuery struct {
-	path        string
-	queryHeight uint64
-	sender      string
+	path   string
+	sender string
 }
 
 type testIBCQueryResult struct {
-	id          string
-	queryHeight uint64
-	result      types.QueryResult
-	data        []byte
+	id     string
+	result types.QueryResult
+	data   []byte
 }
 
-type testCase struct {
-	path string
-	queryHeight uint64
-	expData []byte
+func TestIBCQueryTestSuite(t *testing.T) {
+	suite.Run(t, new(IBCQueryTestSuite))
 }
 
-func sendIBCQuery(i *IBCQueryTestSuite, query testIBCQuery) (queryId string, capKey *captypes.Capability, err error) {
-	msg := types.NewMsgSubmitCrossChainQuery(query.path, clienttypes.NewHeight(0, 0), uint64(time.Now().Add(time.Hour).UnixNano()), query.queryHeight, i.queriedChain.ChainID, query.sender)
-	resp, err := i.queryingChain.App.(*app.App).IBCQueryKeeper.SubmitCrossChainQuery(i.queryingChain.GetContext(), msg)
+func (i *IBCQueryTestSuite) TestIBCQueryToBank() {
+	_, _, senderAddr := testdata.KeyTestPubAddr()
+	_, _, targetAddr := testdata.KeyTestPubAddr()
+	const denom = "testDenom"
+	const denomAmount = 1000
+	balance := cosmostypes.NewInt64Coin(denom, denomAmount)
+	err := i.setAddrBalance(targetAddr, balance)
 	if err != nil {
-		return "", captypes.NewCapability(0), err
-	}
-	return resp.Id, resp.CapKey, nil
-}
-
-func submitIBCQueryResult(i *IBCQueryTestSuite, result testIBCQueryResult) error {
-	msg := types.NewMsgSubmitCrossChainQueryResult(result.id, result.queryHeight, result.result, result.data, nil)
-	_, err := i.queryingChain.App.(*app.App).IBCQueryKeeper.SubmitCrossChainQueryResult(i.queryingChain.GetContext(), msg)
-	if err != nil {
-		return err
-	}
-	return nil
-}
-
-func pruneIBCQueryResult(i *IBCQueryTestSuite, queryId string, capKey *captypes.Capability, sender string) (result types.QueryResult, data []byte, err error) {
-	msg := types.NewMsgSubmitPruneCrossChainQueryResult(queryId, capKey, sender)
-	resp, err := i.queryingChain.App.(*app.App).IBCQueryKeeper.SubmitPruneCrossChainQueryResult(i.queryingChain.GetContext(), msg)
-	if err != nil {
-		return 0, []byte{}, err
+		i.Require().Fail("fail to mint coin for test addr", err.Error())
+		return
 	}
 
-	return resp.Result, resp.Data, nil
-}
+	queryPath := "http://blockchains:27011/cosmos/bank/v1beta1/balances/" + targetAddr.String()
+	query := testIBCQuery{path: queryPath, sender: senderAddr.String()}
+	queryId, _, err := i.sendIBCQuery(query)
+	if err != nil {
+		i.Require().Fail("fail to send IBC query", err.Error())
+		return
+	}
 
-func grpcQueryToBankModule(i *IBCQueryTestSuite, addr string) (data []byte) {
-	request := &banktypes.QueryBalanceRequest{Address: addr}
-	i.queriedChain.App.(*app.App).BankKeeper.Balance(i.queryingChain.GetContext(), )
-}
+	path, isExist := i.getIBCQuery(queryId)
+	if !isExist {
+		i.Require().Fail("IBC query doesn't exist in querying chain")
+		return
+	}
 
-func (i *IBCQueryTestSuite) TestIBCQuery() {
-	i.SetupTest()
-	query := testIBCQuery{path: , queryHeight: , }
-	id, capKey, err := sendIBCQuery(i, )
-}
+	result, err := i.relayToQueriedChain(queryId, path, denom)
+	if err != nil {
+		i.Require().Fail("fail to relay IBC query to queried chian", err.Error())
+		return
+	}
 
-func checkInterface(app testing.TestingApp) {
+	err = i.submitIBCQueryResult(result)
+	if err != nil {
+		i.Require().Fail("fail to submit query result to querying chain", err.Error())
+	}
 
+	queryResult, data, err := i.pruneIBCQueryResult(queryId, senderAddr.String())
+	if err != nil {
+		i.Require().Fail("fail to prune query result", err.Error())
+	}
+	if queryResult != types.QueryResult_QUERY_RESULT_SUCCESS {
+		i.Require().Fail("result is not result_success")
+	}
+	amountStr := strconv.Itoa(denomAmount)
+	queriedData := string(data)
+	queriedData = trimQueriedData(queriedData)
+	i.Require().Equal(denom+" "+amountStr, queriedData)
 }

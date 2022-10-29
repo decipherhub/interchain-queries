@@ -4,7 +4,6 @@ import (
 	ibctesting "github.com/cosmos/ibc-go/v5/testing"
 	"github.com/cosmos/interchain-queries/testutil/simapp"
 	"github.com/stretchr/testify/suite"
-	"testing"
 )
 
 // IBCQueryTestSuite QueriedChain doesn't receive packet in IBCQuery
@@ -14,10 +13,6 @@ type IBCQueryTestSuite struct {
 	coordinator   *ibctesting.Coordinator
 	queryingChain *ibctesting.TestChain
 	queriedChain  *ibctesting.TestChain
-}
-
-func TestIBCQueryTestSuite(t *testing.T) {
-	suite.Run(t, new(IBCQueryTestSuite))
 }
 
 func (suite *IBCQueryTestSuite) SetupTest() {
