@@ -101,14 +101,14 @@ func (k Keeper) SetNextQuerySequence(ctx sdk.Context, sequence uint64) {
 	store.Set([]byte(types.KeyNextQuerySequence), bz)
 }
 
-// SetSubmitCrossChainQuery stores the MsgSubmitCrossChainQuery in state keyed by the query id
+// SetCrossChainQuery stores the CrossChainQuery in state keyed by the query id
 func (k Keeper) SetCrossChainQuery(ctx sdk.Context, queryPath string, query types.CrossChainQuery) {
     store := prefix.NewStore(ctx.KVStore(k.storeKey), types.QueryKey)
     bz := k.MustMarshalQuery(&query)
     store.Set([]byte(queryPath), bz)
 }
 
-// GetSubmitCrossChainQuery retrieve the MsgSubmitCrossChainQuery stored in state given the query id
+// GetCrossChainQuery retrieve the CrossChainQuery stored in state given the query id
 func (k Keeper) GetCrossChainQuery(ctx sdk.Context, queryPath string) (types.CrossChainQuery, bool) {
     store := prefix.NewStore(ctx.KVStore(k.storeKey), types.QueryKey)
     key := []byte(queryPath)
@@ -120,7 +120,7 @@ func (k Keeper) GetCrossChainQuery(ctx sdk.Context, queryPath string) (types.Cro
     return k.MustUnmarshalQuery(bz), true
 }
 
-// GetAllSubmitCrossChainQueries returns a list of all MsgSubmitCrossChainQueries that are stored in state
+// GetAllCrossChainQueries returns a list of all CrossChainQueries that are stored in state
 func (k Keeper) GetAllCrossChainQueries(ctx sdk.Context) []*types.CrossChainQuery {
     var crossChainQueries []*types.CrossChainQuery
     store := ctx.KVStore(k.storeKey)
@@ -136,16 +136,12 @@ func (k Keeper) GetAllCrossChainQueries(ctx sdk.Context) []*types.CrossChainQuer
     return crossChainQueries
 }
 
-// DeleteCrossChainQuery deletes MsgSubmitCrossChainQuery associated with the query id
+// DeleteCrossChainQuery deletes CrossChainQuery associated with the query id
 func (k Keeper) DeleteCrossChainQuery(ctx sdk.Context, queryPath string) {
     store := prefix.NewStore(ctx.KVStore(k.storeKey), types.QueryKey)
     store.Delete([]byte(queryPath))
 }
 
-// TODO
-// func handleIbcQueryResult
-// 1. relayer should be call this func with query result
-// 2. save query in private store
 
 // SetCrossChainQueryResult stores the CrossChainQueryResult in state keyed by the query id
 func (k Keeper) SetCrossChainQueryResult(ctx sdk.Context, resultQueryPath string, result types.CrossChainQueryResult) {
