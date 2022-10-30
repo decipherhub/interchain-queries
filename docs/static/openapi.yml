@@ -69163,15 +69163,6 @@ definitions:
             NOTE: The amount field is an Int which implements the custom method
             signatures required by gogoproto.
     description: Period defines a length of time and amount of coins that will vest.
-  cosmos.capability.v1beta1.Capability:
-    type: object
-    properties:
-      index:
-        type: string
-        format: uint64
-    description: |-
-      Capability defines an implementation of an object capability. The index
-      provided to a Capability must be globally unique.
   ibc.applications.ibc_query.v1.CrossChainQuery:
     type: object
     properties:
@@ -69228,16 +69219,7 @@ definitions:
       id:
         type: string
       cap_key:
-        type: object
-        properties:
-          index:
-            type: string
-            format: uint64
-        description: >-
-          Capability defines an implementation of an object capability. The
-          index
-
-          provided to a Capability must be globally unique.
+        type: string
     title: MsgSubmitCrossChainQueryResponse
   ibc.applications.ibc_query.v1.MsgSubmitCrossChainQueryResultResponse:
     type: object
@@ -69421,7 +69403,6 @@ definitions:
           empty child is the prehash image that is used when one child is nil
           (eg. 20 bytes of 0)
       hash:
-        title: hash is the algorithm that must be used for each InnerOp
         type: string
         enum:
           - NO_HASH
@@ -69586,11 +69567,6 @@ definitions:
     type: object
     properties:
       leaf_spec:
-        title: >-
-          any field in the ExistenceProof must be the same as in this spec.
-
-          except Prefix, which is just the first bytes of prefix (spec can be
-          longer)
         type: object
         properties:
           hash:
@@ -69730,7 +69706,6 @@ definitions:
               empty child is the prehash image that is used when one child is
               nil (eg. 20 bytes of 0)
           hash:
-            title: hash is the algorithm that must be used for each InnerOp
             type: string
             enum:
               - NO_HASH
