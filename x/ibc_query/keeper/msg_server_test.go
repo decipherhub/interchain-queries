@@ -1,8 +1,10 @@
 package keeper_test
 
 import (
+	"fmt"
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	capabilitytypes "github.com/cosmos/cosmos-sdk/x/capability/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
@@ -93,10 +95,10 @@ func TestSubmitCrossChainQuery(t *testing.T) {
 // If relayer gets query data from queried chain, relayer calls SubmitCrossChainQueryResult function.
 // Delete the query from the local, private store and create a query result record.
 func TestSubmitCrossChainQueryResult(t *testing.T) {
-	senderAddr := "cosmos37dtl0mjt3t77dpoyz2edqzjpszulwhgnga7ljs"
+	_, _, senderAddr := testdata.KeyTestPubAddr()
 
     var (
-		query            *types.MsgSubmitCrossChainQueryResponse
+		query          *types.MsgSubmitCrossChainQueryResponse
 		IBCQueryKeeper ibcquerykeeper.Keeper
 		ctx            sdk.Context
 		mocks          testkeeper.MockedKeepers
@@ -111,7 +113,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
         {
             "success: valid query id", true, func () (*types.MsgSubmitCrossChainQueryResponse) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, _, query = testkeeper.GetSubmitCrossChainQueryKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				query = testkeeper.SetupForSubmitCrossChainQueryState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return query
 			},
 			types.MsgSubmitCrossChainQueryResult{
@@ -119,13 +121,13 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 				QueryHeight:  uint64(ctx.BlockHeight()),
 				Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 				Data:         []byte("test result data"),
-				Sender:       senderAddr,
+				Sender:       senderAddr.String(),
 			},
         },
 		{
             "fail: invalid query id", false, func () (*types.MsgSubmitCrossChainQueryResponse) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, _, query = testkeeper.GetSubmitCrossChainQueryKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				query = testkeeper.SetupForSubmitCrossChainQueryState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return query
 			},
 			types.MsgSubmitCrossChainQueryResult{
@@ -133,7 +135,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 				QueryHeight:  uint64(ctx.BlockHeight()),
 				Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 				Data:         []byte("test result data"),
-				Sender:       senderAddr,
+				Sender:       senderAddr.String(),
 			},
         },
 	}
@@ -156,6 +158,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 			require.Equal(t, queryResult.Id, tc.queryResult.Id)
 			require.Equal(t, queryResult.Data, tc.queryResult.Data)
 			require.Equal(t, queryResult.Result, tc.queryResult.Result)
+			require.Equal(t, senderAddr.String(), queryResult.Sender)
 		} else {
 			require.Error(t, err)
 		}
@@ -166,8 +169,9 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 // TestSubmitPruneCrossChainQueryResult validates PruneCrossChainQueryResult against the spec.
 // If the caller has the right to clean the query result, the function delete the query result from the the local, private store.
 func TestSubmitPruneCrossChainQueryResult(t *testing.T) {
-	invalidSenderAddr := "cosmos37dtl0mjt3t77dpoyz13jdbzaqellwhgnga7ljs"
-	senderAddr := "cosmos37dtl0mjt3t77dpoyz2edqzjpszulwhgnga7ljs"
+	_, _, invalidSenderAddr := testdata.KeyTestPubAddr()
+	_, _, senderAddr := testdata.KeyTestPubAddr()
+
     var (
 		queryResult    types.MsgSubmitCrossChainQueryResult
 		IBCQueryKeeper ibcquerykeeper.Keeper
@@ -185,7 +189,7 @@ func TestSubmitPruneCrossChainQueryResult(t *testing.T) {
             "success: valid query id", true,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				dummyCap := &capabilitytypes.Capability{}
 				gomock.InOrder(		
 					mocks.MockScopedKeeper.EXPECT().GetCapability(
@@ -199,27 +203,27 @@ func TestSubmitPruneCrossChainQueryResult(t *testing.T) {
 			},
 			types.MsgSubmitPruneCrossChainQueryResult {
 				Id: "query-0",       
-				Sender: senderAddr,
+				Sender: senderAddr.String(),
 			},
         },
 		{
             "fail: invalid query id", false,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return queryResult
 			},
 			types.MsgSubmitPruneCrossChainQueryResult {
 				Id: "query-1",
-				Sender: senderAddr,
+				Sender: senderAddr.String(),
 			},
         },
 		{
             "success: valid query id", true,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				dummyCap := &capabilitytypes.Capability{}
 				gomock.InOrder(		
 					mocks.MockScopedKeeper.EXPECT().GetCapability(
@@ -233,28 +237,28 @@ func TestSubmitPruneCrossChainQueryResult(t *testing.T) {
 			},
 			types.MsgSubmitPruneCrossChainQueryResult {
 				Id: "query-1",       
-				Sender: senderAddr,
+				Sender: senderAddr.String(),
 			},
         },
 		{
             "fail: invalid capability", false,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				dummyCap := &capabilitytypes.Capability{}
 				gomock.InOrder(		
 					mocks.MockScopedKeeper.EXPECT().GetCapability(
-						ctx, types.FormatQueryCapabilityIdentifier(queryResult.Id, invalidSenderAddr),
+						ctx, types.FormatQueryCapabilityIdentifier(queryResult.Id, invalidSenderAddr.String()),
 					).Return(dummyCap, true).Times(1),
 					mocks.MockScopedKeeper.EXPECT().AuthenticateCapability(
-						ctx, dummyCap, types.FormatQueryCapabilityIdentifier(queryResult.Id, senderAddr),
+						ctx, dummyCap, types.FormatQueryCapabilityIdentifier(queryResult.Id, senderAddr.String()),
 					).Return(false),
 				)
 				return queryResult
 			},
 			types.MsgSubmitPruneCrossChainQueryResult {
 				Id: "query-0",
-				Sender: invalidSenderAddr,
+				Sender: invalidSenderAddr.String(),
 			},
         },
 	}
@@ -265,6 +269,7 @@ func TestSubmitPruneCrossChainQueryResult(t *testing.T) {
 		require.True(t, found)   
 		
 		// Run SubmitPruneCrossChainQueryResult
+		fmt.Println(tc.name, queryResult.Id, senderAddr.String(), tc.pruneMsg.Sender)
 		pruneResult, err := IBCQueryKeeper.SubmitPruneCrossChainQueryResult(ctx, &tc.pruneMsg)	
 		if tc.expPass {
 			require.NoError(t, err)

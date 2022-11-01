@@ -3,6 +3,7 @@ package keeper_test
 import (
 	"testing"
 
+	"github.com/cosmos/cosmos-sdk/testutil/testdata"
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	testkeeper "github.com/cosmos/interchain-queries/testutil/keeper"
 	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc_query/keeper"
@@ -13,6 +14,8 @@ import (
 // TestCrossChainQueryResult validates CrossChainQueryResult against the spec.
 // Retrieve the query result from the private store using the query's identifier.
 func TestCrossChainQueryResult(t *testing.T) {
+	_, _, senderAddr := testdata.KeyTestPubAddr()
+	
     var (
 		queryResult    types.MsgSubmitCrossChainQueryResult
 		IBCQueryKeeper ibcquerykeeper.Keeper
@@ -30,7 +33,7 @@ func TestCrossChainQueryResult(t *testing.T) {
             "success: query valid query id", true,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return queryResult
 			},
 			types.QueryCrossChainQueryResult{
@@ -41,8 +44,8 @@ func TestCrossChainQueryResult(t *testing.T) {
             "success: query valid query id", true,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return queryResult
 			},
 			types.QueryCrossChainQueryResult{
@@ -53,7 +56,7 @@ func TestCrossChainQueryResult(t *testing.T) {
             "fail: query invalid query id", false,
 			func () (types.MsgSubmitCrossChainQueryResult) {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				IBCQueryKeeper, ctx, mocks, queryResult = testkeeper.GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
+				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
 				return queryResult
 			},
 			types.QueryCrossChainQueryResult{
