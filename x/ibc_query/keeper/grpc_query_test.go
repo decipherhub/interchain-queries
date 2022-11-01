@@ -8,6 +8,7 @@ import (
 	testkeeper "github.com/cosmos/interchain-queries/testutil/keeper"
 	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc_query/keeper"
 	"github.com/cosmos/interchain-queries/x/ibc_query/types"
+	"github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 )
 
@@ -17,58 +18,81 @@ func TestCrossChainQueryResult(t *testing.T) {
 	_, _, senderAddr := testdata.KeyTestPubAddr()
 	
     var (
-		queryResult    types.MsgSubmitCrossChainQueryResult
-		IBCQueryKeeper ibcquerykeeper.Keeper
-		ctx            sdk.Context
-		mocks          testkeeper.MockedKeepers
+		msgSubmitQuery  types.MsgSubmitCrossChainQuery
+		queryResult     types.MsgSubmitCrossChainQueryResult
+		IBCQueryKeeper  ibcquerykeeper.Keeper
+		ctx             sdk.Context
+		mocks           testkeeper.MockedKeepers
     )
 
     testCases := []struct {
-        msg          string
-		expPass      bool
-        setUp        func() (types.MsgSubmitCrossChainQueryResult)
-		queryMsg     types.QueryCrossChainQueryResult
+        msg             string
+		expPass         bool
+        setUp           func()
+		queryMsg        types.QueryCrossChainQueryResult
+		expQueryResult  types.QueryCrossChainQueryResultResponse
     }{
         {
             "success: query valid query id", true,
-			func () (types.MsgSubmitCrossChainQueryResult) {
+			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
-				return queryResult
+				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
+				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-0",
 			},
+			types.QueryCrossChainQueryResultResponse{
+				Id:       "query-0",
+				Result:   types.QueryResult_QUERY_RESULT_SUCCESS,
+				Data:     []byte("test result data"),
+			},
         },
 		{
             "success: query valid query id", true,
-			func () (types.MsgSubmitCrossChainQueryResult) {
+			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
-				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
-				return queryResult
+				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
+				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
+				gomock.InOrder(testkeeper.GetMocksForSubmitCrossChainQuery(ctx, &mocks, "query-0", msgSubmitQuery.Sender)...)
+				IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msgSubmitQuery)   
+				IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)
+
+				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-1", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-1",
+			},
+			types.QueryCrossChainQueryResultResponse{
+				Id:       "query-1",
+				Result:   types.QueryResult_QUERY_RESULT_SUCCESS,
+				Data:     []byte("test result data"),
 			},
         },
 		{
             "fail: query invalid query id", false,
-			func () (types.MsgSubmitCrossChainQueryResult) {
+			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
-				queryResult = testkeeper.SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper, ctx, mocks, senderAddr.String())
-				return queryResult
+				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
+				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-1",
 			},
+			types.QueryCrossChainQueryResultResponse{},
         },
     }
 
     for _, tc := range testCases {
-		queryResult := tc.setUp()
-		queryResultRes, err := IBCQueryKeeper.CrossChainQueryResult(ctx, &tc.queryMsg)
+		tc.setUp()
 
+		// Run SubmitCrossChainQuery
+		gomock.InOrder(testkeeper.GetMocksForSubmitCrossChainQuery(ctx, &mocks, testkeeper.GetQueryId(IBCQueryKeeper, ctx), msgSubmitQuery.Sender)...)
+		IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msgSubmitQuery)
+		IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)   
+
+		// Run query CrossChainQueryResult
+		queryResultRes, err := IBCQueryKeeper.CrossChainQueryResult(ctx, &tc.queryMsg)
 		if tc.expPass {
 			require.NoError(t, err)
 			require.Equal(t, queryResult.Id, queryResultRes.Id)
