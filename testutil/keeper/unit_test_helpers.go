@@ -3,8 +3,6 @@ package keeper
 import (
 	"testing"
 
-	"github.com/cosmos/interchain-queries/x/ibc_query/types"
-
 	"github.com/cosmos/cosmos-sdk/codec"
 	codectypes "github.com/cosmos/cosmos-sdk/codec/types"
 	"github.com/cosmos/cosmos-sdk/store"
@@ -15,6 +13,7 @@ import (
 	typesparams "github.com/cosmos/cosmos-sdk/x/params/types"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
 	ibcquerykeeper "github.com/cosmos/interchain-queries/x/ibc_query/keeper"
+	"github.com/cosmos/interchain-queries/x/ibc_query/types"
 	gomock "github.com/golang/mock/gomock"
 	"github.com/stretchr/testify/require"
 	"github.com/tendermint/tendermint/libs/log"
@@ -105,15 +104,43 @@ func GetIBCQueryKeeperAndCtx(t *testing.T, params InMemKeeperParams) (
 	return NewInMemIBCQueryKeeper(params, mocks), params.Ctx, ctrl, mocks
 }
 
-// Returns an in-memory provider keeper, context, controller, and mocks after query data is stored in the store
-func GetSubmitCrossChainQueryKeeperAndCtx(IBCQueryKeeper ibcquerykeeper.Keeper, 
-	ctx sdk.Context, mocks MockedKeepers) (
-	ibcquerykeeper.Keeper, sdk.Context, MockedKeepers, *types.MsgSubmitCrossChainQueryResponse) {
+// Set the quering chain with the query request received
+func SetupForSubmitCrossChainQueryState(IBCQueryKeeper ibcquerykeeper.Keeper, 
+	ctx sdk.Context, mocks MockedKeepers, senderAddr string) (*types.MsgSubmitCrossChainQueryResponse) {
 
+	SetMocksForCapabilityQueryingChain(IBCQueryKeeper, ctx, mocks, senderAddr)
+	query := GetSubmitCrossChainQuery(IBCQueryKeeper, ctx, senderAddr)
+	
+	return query
+}
+
+
+// Set the quering chain with the query request result received
+func SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper ibcquerykeeper.Keeper, 
+	ctx sdk.Context, mocks MockedKeepers, senderAddr string) (types.MsgSubmitCrossChainQueryResult) {
+
+	query := SetupForSubmitCrossChainQueryState(IBCQueryKeeper, ctx, mocks, senderAddr)
+	queryResult := GetSubmitCrossChainQueryResult(IBCQueryKeeper, ctx, senderAddr, query.Id)
+	return queryResult
+}
+
+// setUpForCapabilityQueryingChain registers expected mock calls and corresponding state setup
+func SetMocksForCapabilityQueryingChain(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, 
+	mocks MockedKeepers, senderAddr string) {
 	var( errFromNewCap  error )
-	senderAddr := "cosmos37dtl0mjt3t77dpoyz2edqzjpszulwhgnga7ljs"
 	dummyCap := &capabilitytypes.Capability{}
 
+	nextQuerySeq := IBCQueryKeeper.GetNextQuerySequence(ctx)
+	queryID := types.FormatQueryIdentifier(nextQuerySeq)
+	gomock.InOrder(			
+		mocks.MockScopedKeeper.EXPECT().NewCapability(
+			ctx, types.FormatQueryCapabilityIdentifier(queryID, senderAddr),
+		).Return(dummyCap, errFromNewCap),
+	)
+}
+
+
+func GetSubmitCrossChainQuery(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, senderAddr string) *types.MsgSubmitCrossChainQueryResponse {
 	msg := types.MsgSubmitCrossChainQuery{
 		Path:               "test/query_path",
 		LocalTimeoutHeight: clienttypes.NewHeight(0, uint64(ctx.BlockHeight() + 50)),
@@ -122,34 +149,19 @@ func GetSubmitCrossChainQueryKeeperAndCtx(IBCQueryKeeper ibcquerykeeper.Keeper,
 		ChainId:            "ibc-query",
 		Sender:             senderAddr,
 	}
-
-	nextQuerySeq := IBCQueryKeeper.GetNextQuerySequence(ctx)
-	queryID := types.FormatQueryIdentifier(nextQuerySeq)
-	gomock.InOrder(			
-		mocks.MockScopedKeeper.EXPECT().NewCapability(
-			ctx, types.FormatQueryCapabilityIdentifier(queryID, msg.Sender),
-		).Return(dummyCap, errFromNewCap),
-	)
 	query, _ := IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msg)
-	return IBCQueryKeeper, ctx, mocks, query
+	return query
 }
 
-
-// Returns an in-memory provider keeper, context, controller, and mocks after query result data is stored in the store
-func GetSubmitCrossChainQueryResultKeeperAndCtx(IBCQueryKeeper ibcquerykeeper.Keeper, 
-	ctx sdk.Context, mocks MockedKeepers) (
-	ibcquerykeeper.Keeper, sdk.Context, MockedKeepers, types.MsgSubmitCrossChainQueryResult) {
-
-	senderAddr := "cosmos37dtl0mjt3t77dpoyz2edqzjpszulwhgnga7ljs"
-	IBCQueryKeeper, ctx, mocks, query := GetSubmitCrossChainQueryKeeperAndCtx(IBCQueryKeeper, ctx, mocks)
-
+// 
+func GetSubmitCrossChainQueryResult(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, senderAddr string, queryId string) types.MsgSubmitCrossChainQueryResult {
 	queryResult := types.MsgSubmitCrossChainQueryResult{
-		Id:           query.Id,
+		Id:           queryId,
 		QueryHeight:  uint64(ctx.BlockHeight()),
 		Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 		Data:         []byte("test result data"),
 		Sender:       senderAddr,
 	}
 	IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)
-	return IBCQueryKeeper, ctx, mocks, queryResult
+	return queryResult
 }
