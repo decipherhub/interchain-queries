@@ -19,7 +19,7 @@ func TestCrossChainQueryResult(t *testing.T) {
 	
     var (
 		msgSubmitQuery  types.MsgSubmitCrossChainQuery
-		queryResult     types.MsgSubmitCrossChainQueryResult
+		msgQueryResult  types.MsgSubmitCrossChainQueryResult
 		IBCQueryKeeper  ibcquerykeeper.Keeper
 		ctx             sdk.Context
 		mocks           testkeeper.MockedKeepers
@@ -37,7 +37,7 @@ func TestCrossChainQueryResult(t *testing.T) {
 			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
 				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
-				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
+				msgQueryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-0",
@@ -53,12 +53,12 @@ func TestCrossChainQueryResult(t *testing.T) {
 			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
 				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
-				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
+				msgQueryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
 				gomock.InOrder(testkeeper.GetMocksForSubmitCrossChainQuery(ctx, &mocks, "query-0", msgSubmitQuery.Sender)...)
 				IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msgSubmitQuery)   
-				IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)
+				IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &msgQueryResult)
 
-				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-1", senderAddr.String())
+				msgQueryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-1", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-1",
@@ -74,7 +74,7 @@ func TestCrossChainQueryResult(t *testing.T) {
 			func () {
 				IBCQueryKeeper, ctx, _, mocks = testkeeper.GetIBCQueryKeeperAndCtx(t, testkeeper.NewInMemKeeperParams(t))
 				msgSubmitQuery = testkeeper.GetMsgSubmitCrossChainQuery(ctx, "test/path", senderAddr.String())
-				queryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
+				msgQueryResult = testkeeper.GetMsgSubmitCrossChainQueryResult(ctx, "query-0", senderAddr.String())
 			},
 			types.QueryCrossChainQueryResult{
 				Id: "query-1",
@@ -89,15 +89,15 @@ func TestCrossChainQueryResult(t *testing.T) {
 		// Run SubmitCrossChainQuery
 		gomock.InOrder(testkeeper.GetMocksForSubmitCrossChainQuery(ctx, &mocks, testkeeper.GetQueryId(IBCQueryKeeper, ctx), msgSubmitQuery.Sender)...)
 		IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msgSubmitQuery)
-		IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)   
+		IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &msgQueryResult)   
 
 		// Run query CrossChainQueryResult
 		queryResultRes, err := IBCQueryKeeper.CrossChainQueryResult(ctx, &tc.queryMsg)
 		if tc.expPass {
 			require.NoError(t, err)
-			require.Equal(t, queryResult.Id, queryResultRes.Id)
-			require.Equal(t, queryResult.Data, queryResultRes.Data)
-			require.Equal(t, queryResult.Result, queryResultRes.Result)
+			require.Equal(t, msgQueryResult.Id, queryResultRes.Id)
+			require.Equal(t, msgQueryResult.Data, queryResultRes.Data)
+			require.Equal(t, msgQueryResult.Result, queryResultRes.Result)
 		} else {
 			require.Error(t, err)
 		}
