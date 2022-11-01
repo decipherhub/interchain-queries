@@ -104,57 +104,53 @@ func GetIBCQueryKeeperAndCtx(t *testing.T, params InMemKeeperParams) (
 	return NewInMemIBCQueryKeeper(params, mocks), params.Ctx, ctrl, mocks
 }
 
-// Set the quering chain with the query request received
-func SetupForSubmitCrossChainQueryState(IBCQueryKeeper ibcquerykeeper.Keeper, 
-	ctx sdk.Context, mocks MockedKeepers, senderAddr string) (*types.MsgSubmitCrossChainQueryResponse) {
-
-	SetMocksForCapabilityQueryingChain(IBCQueryKeeper, ctx, mocks, senderAddr)
-	query := GetSubmitCrossChainQuery(IBCQueryKeeper, ctx, senderAddr)
-	
-	return query
-}
-
-
-// Set the quering chain with the query request result received
-func SetupForSubmitCrossChainQueryResultState(IBCQueryKeeper ibcquerykeeper.Keeper, 
-	ctx sdk.Context, mocks MockedKeepers, senderAddr string) (types.MsgSubmitCrossChainQueryResult) {
-
-	query := SetupForSubmitCrossChainQueryState(IBCQueryKeeper, ctx, mocks, senderAddr)
-	queryResult := GetSubmitCrossChainQueryResult(IBCQueryKeeper, ctx, senderAddr, query.Id)
-	return queryResult
-}
-
-// setUpForCapabilityQueryingChain registers expected mock calls and corresponding state setup
-func SetMocksForCapabilityQueryingChain(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, 
-	mocks MockedKeepers, senderAddr string) {
+// GetMocksForSubmitCrossChainQuery returns mock expectations needed to call SubmitCrossChainQuery()
+func GetMocksForSubmitCrossChainQuery(ctx sdk.Context, mocks *MockedKeepers, 
+	queryId string, senderAddr string) []*gomock.Call {
 	var( errFromNewCap  error )
 	dummyCap := &capabilitytypes.Capability{}
-
-	nextQuerySeq := IBCQueryKeeper.GetNextQuerySequence(ctx)
-	queryID := types.FormatQueryIdentifier(nextQuerySeq)
-	gomock.InOrder(			
+	return []*gomock.Call{			
 		mocks.MockScopedKeeper.EXPECT().NewCapability(
-			ctx, types.FormatQueryCapabilityIdentifier(queryID, senderAddr),
-		).Return(dummyCap, errFromNewCap),
-	)
+			ctx, types.FormatQueryCapabilityIdentifier(queryId, senderAddr),
+		).Return(dummyCap, errFromNewCap).Times(1),
+	}
 }
 
+// setUpForCapabilityQueryingChain returns mock expectations needed to call PruneCrossChainQueryResult()
+func GetMocksForPruneCrossChainQueryResult(ctx sdk.Context, mocks *MockedKeepers, 
+	queryId string, senderAddr string) []*gomock.Call {
+	dummyCap := &capabilitytypes.Capability{}
+	return []*gomock.Call{			
+		mocks.MockScopedKeeper.EXPECT().GetCapability(
+			ctx, types.FormatQueryCapabilityIdentifier(queryId, senderAddr),
+		).Return(dummyCap, true).Times(1),
+		mocks.MockScopedKeeper.EXPECT().AuthenticateCapability(
+			ctx, dummyCap, types.FormatQueryCapabilityIdentifier(queryId, senderAddr),
+		).Return(true).Times(1),
+	}
+}
 
-func GetSubmitCrossChainQuery(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, senderAddr string) *types.MsgSubmitCrossChainQueryResponse {
+// GetQueryId returns query identifier
+func GetQueryId(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context) string {
+	nextQuerySeq := IBCQueryKeeper.GetNextQuerySequence(ctx)
+	return types.FormatQueryIdentifier(nextQuerySeq)
+}
+
+// GetMsgSubmitCrossChainQuery returns MsgSubmitCrossChainQuery
+func GetMsgSubmitCrossChainQuery(ctx sdk.Context, path string, senderAddr string) types.MsgSubmitCrossChainQuery {
 	msg := types.MsgSubmitCrossChainQuery{
-		Path:               "test/query_path",
+		Path:               path,
 		LocalTimeoutHeight: clienttypes.NewHeight(0, uint64(ctx.BlockHeight() + 50)),
 		LocalTimeoutStamp:  uint64(ctx.BlockTime().UnixNano() + 5000000),
 		QueryHeight:        uint64(ctx.BlockHeight()),
 		ChainId:            "ibc-query",
 		Sender:             senderAddr,
 	}
-	query, _ := IBCQueryKeeper.SubmitCrossChainQuery(ctx, &msg)
-	return query
+	return msg
 }
 
-// 
-func GetSubmitCrossChainQueryResult(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context, senderAddr string, queryId string) types.MsgSubmitCrossChainQueryResult {
+// GetMsgSubmitCrossChainQueryResult returns MsgSubmitCrossChainQueryResult
+func GetMsgSubmitCrossChainQueryResult(ctx sdk.Context, queryId string, senderAddr string) types.MsgSubmitCrossChainQueryResult {
 	queryResult := types.MsgSubmitCrossChainQueryResult{
 		Id:           queryId,
 		QueryHeight:  uint64(ctx.BlockHeight()),
@@ -162,6 +158,5 @@ func GetSubmitCrossChainQueryResult(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sd
 		Data:         []byte("test result data"),
 		Sender:       senderAddr,
 	}
-	IBCQueryKeeper.SubmitCrossChainQueryResult(ctx, &queryResult)
 	return queryResult
 }
