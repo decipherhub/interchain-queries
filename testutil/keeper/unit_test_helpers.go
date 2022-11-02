@@ -131,13 +131,13 @@ func GetMocksForPruneCrossChainQueryResult(ctx sdk.Context, mocks *MockedKeepers
 }
 
 // GetQueryId returns query identifier
-func GetQueryId(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context) string {
+func NewQueryId(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context) string {
 	nextQuerySeq := IBCQueryKeeper.GetNextQuerySequence(ctx)
 	return types.FormatQueryIdentifier(nextQuerySeq)
 }
 
-// GetMsgSubmitCrossChainQuery returns MsgSubmitCrossChainQuery
-func GetMsgSubmitCrossChainQuery(ctx sdk.Context, path string, senderAddr string) types.MsgSubmitCrossChainQuery {
+// NewMsgSubmitCrossChainQueryForTest returns MsgSubmitCrossChainQuery
+func NewMsgSubmitCrossChainQueryForTest(ctx sdk.Context, path string, senderAddr string) types.MsgSubmitCrossChainQuery {
 	msg := types.MsgSubmitCrossChainQuery{
 		Path:               path,
 		LocalTimeoutHeight: clienttypes.NewHeight(0, uint64(ctx.BlockHeight() + 50)),
@@ -149,8 +149,8 @@ func GetMsgSubmitCrossChainQuery(ctx sdk.Context, path string, senderAddr string
 	return msg
 }
 
-// GetMsgSubmitCrossChainQueryResult returns MsgSubmitCrossChainQueryResult
-func GetMsgSubmitCrossChainQueryResult(ctx sdk.Context, queryId string, senderAddr string) types.MsgSubmitCrossChainQueryResult {
+// NewMsgSubmitCrossChainQueryResultForTest returns MsgSubmitCrossChainQueryResult
+func NewMsgSubmitCrossChainQueryResultForTest(ctx sdk.Context, queryId string, senderAddr string) types.MsgSubmitCrossChainQueryResult {
 	queryResult := types.MsgSubmitCrossChainQueryResult{
 		Id:           queryId,
 		QueryHeight:  uint64(ctx.BlockHeight()),
