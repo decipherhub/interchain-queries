@@ -111,11 +111,12 @@ func (k Keeper) SubmitPruneCrossChainQueryResult(goCtx context.Context, msg *typ
 		return nil, sdkerrors.ErrNotFound
 	}
 
-	// crossChainQueryCapId is a capability key created based on value stored local
+	// crossChainQueryCapId is a capability id created based on value stored local
 	crossChainQueryCapId := k.GenerateQueryCapabilityIdentifier(queryResult.Id, queryResult.Sender)
 
-	// retrieveCapId is a capability key created based on requester value
+	// retrieveCapId is a capability id created based on requester value
 	retrieveCapId := k.GenerateQueryCapabilityIdentifier(msg.Id, msg.Sender)
+	// get a capability key from retrieveCapId
 	capKey, found :=  k.scopedKeeper.GetCapability(ctx, retrieveCapId)
 	if !found {
 		return nil, types.ErrNotFoundCapability
