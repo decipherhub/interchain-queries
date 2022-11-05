@@ -37,4 +37,5 @@ message CrossChainQueryResult {
   string id = 1;
   QueryResult result = 2;
   bytes data = 3;
+  string sender = 4;
 }

@@ -74,6 +74,7 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 		Id:     msg.Id,
 		Result: msg.Result,
 		Data:   msg.Data,
+		Sender: msg.Sender,
 	}
 
 	query, found := k.GetCrossChainQuery(ctx, types.QueryPath(queryResult.Id))
@@ -110,13 +111,19 @@ func (k Keeper) SubmitPruneCrossChainQueryResult(goCtx context.Context, msg *typ
 		return nil, sdkerrors.ErrNotFound
 	}
 
-	queryCapID := k.GenerateQueryCapabilityIdentifier(msg.Id, msg.Sender)
-	capKey, found :=  k.scopedKeeper.GetCapability(ctx, queryCapID)
+	// crossChainQueryCapId is a capability id created based on value stored local
+	crossChainQueryCapId := k.GenerateQueryCapabilityIdentifier(queryResult.Id, queryResult.Sender)
+
+	// retrieveCapId is a capability id created based on requester value
+	retrieveCapId := k.GenerateQueryCapabilityIdentifier(msg.Id, msg.Sender)
+	// get a capability key from retrieveCapId
+	capKey, found :=  k.scopedKeeper.GetCapability(ctx, retrieveCapId)
 	if !found {
 		return nil, types.ErrNotFoundCapability
 	}
 
-	if !k.scopedKeeper.AuthenticateCapability(ctx, capKey, queryCapID) {
+	// authenticate capability key obtained from retrieveCapId 
+	if !k.scopedKeeper.AuthenticateCapability(ctx, capKey, crossChainQueryCapId) {
 		return nil, types.ErrInvalidCapability
 	}
 
