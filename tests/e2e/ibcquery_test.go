@@ -18,6 +18,7 @@ type testIBCQueryResult struct {
 	id     string
 	result types.QueryResult
 	data   []byte
+	sender string
 }
 
 func TestIBCQueryTestSuite(t *testing.T) {
@@ -30,7 +31,7 @@ func (i *IBCQueryTestSuite) TestIBCQueryToBank() {
 	const denom = "testDenom"
 	const denomAmount = 1000
 	balance := cosmostypes.NewInt64Coin(denom, denomAmount)
-	err := i.setAddrBalance(targetAddr, balance)
+	err := i.setAddrBalanceInQueriedChain(targetAddr, balance)
 	if err != nil {
 		i.Require().Fail("fail to mint coin for test addr", err.Error())
 		return
@@ -50,7 +51,7 @@ func (i *IBCQueryTestSuite) TestIBCQueryToBank() {
 		return
 	}
 
-	result, err := i.relayToQueriedChain(queryId, path, denom)
+	result, err := i.relayToQueriedChainBankModule(queryId, path, denom, senderAddr.String())
 	if err != nil {
 		i.Require().Fail("fail to relay IBC query to queried chian", err.Error())
 		return

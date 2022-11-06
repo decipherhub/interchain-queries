@@ -22,7 +22,7 @@ func (i *IBCQueryTestSuite) sendIBCQuery(query testIBCQuery) (queryId string, ca
 }
 
 func (i *IBCQueryTestSuite) submitIBCQueryResult(result testIBCQueryResult) error {
-	msg := types.NewMsgSubmitCrossChainQueryResult(result.id, 0, result.result, result.data, nil)
+	msg := types.NewMsgSubmitCrossChainQueryResult(result.id, 0, result.result, result.data, result.sender, nil)
 	_, err := i.queryingChain.App.(*app.App).IBCQueryKeeper.SubmitCrossChainQueryResult(i.queryingChain.GetContext(), msg)
 	if err != nil {
 		return err
@@ -41,30 +41,31 @@ func (i *IBCQueryTestSuite) pruneIBCQueryResult(queryId string, sender string) (
 }
 
 func (i *IBCQueryTestSuite) getIBCQuery(queryId string) (path string, isExist bool) {
-	query, isExist := i.queryingChain.App.(*app.App).IBCQueryKeeper.GetCrossChainQuery(i.queryingChain.GetContext(), queryId)
+	query, isExist := i.queryingChain.App.(*app.App).IBCQueryKeeper.GetCrossChainQuery(i.queryingChain.GetContext(), types.QueryPath(queryId))
 	return query.Path, isExist
 }
 
-func (i *IBCQueryTestSuite) relayToQueriedChain(queryId string, path string, denom string) (testIBCQueryResult, error) {
+func (i *IBCQueryTestSuite) relayToQueriedChainBankModule(queryId string, path string, denom string, sender string) (testIBCQueryResult, error) {
 	moduleName, target, addr, err := pathParser(path)
 	if err != nil {
 		return testIBCQueryResult{}, err
 	}
-	switch moduleName {
-	case "bank":
-		if target == "balances" {
-			balance, err := i.grpcQueryToBankModule(addr, denom)
-			if err != nil {
-				return testIBCQueryResult{}, err
-			}
-			data, err := balance.Marshal()
-			if err != nil {
-				return testIBCQueryResult{}, err
-			}
-			return testIBCQueryResult{id: queryId, result: types.QueryResult_QUERY_RESULT_SUCCESS, data: data}, nil
-		}
+	if moduleName != "bank" {
+		return testIBCQueryResult{}, errors.New("module name in path is not bank module")
 	}
-	return testIBCQueryResult{}, errors.New("not defined module for test")
+	if target != "balances" {
+		return testIBCQueryResult{}, errors.New("query target is not balance")
+	}
+
+	balance, err := i.grpcQueryToBankModule(addr, denom)
+	if err != nil {
+		return testIBCQueryResult{}, err
+	}
+	data, err := balance.Marshal()
+	if err != nil {
+		return testIBCQueryResult{}, err
+	}
+	return testIBCQueryResult{id: queryId, result: types.QueryResult_QUERY_RESULT_SUCCESS, data: data, sender: sender}, nil
 }
 
 func pathParser(path string) (moduleName string, target string, addr string, err error) {
@@ -86,7 +87,7 @@ func (i *IBCQueryTestSuite) grpcQueryToBankModule(addr string, denom string) (ba
 	return resp.Balance, err
 }
 
-func (i *IBCQueryTestSuite) setAddrBalance(addr cosmostypes.AccAddress, balance cosmostypes.Coin) error {
+func (i *IBCQueryTestSuite) setAddrBalanceInQueriedChain(addr cosmostypes.AccAddress, balance cosmostypes.Coin) error {
 	ctx := i.queriedChain.GetContext()
 	convAddr := i.queriedChain.App.(*app.App).AccountKeeper.NewAccountWithAddress(ctx, addr)
 	i.queriedChain.App.(*app.App).AccountKeeper.SetAccount(ctx, convAddr)
