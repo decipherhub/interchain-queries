@@ -61,7 +61,7 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	}
 
 	// emit event
-	EmitQueryEvent(ctx, query)
+	EmitQueryEvent(ctx, query, msg.Sender)
 	
 	return &types.MsgSubmitCrossChainQueryResponse{Id: query.Id, CapKey: fmt.Sprint(*queryCapability)}, nil
 }
