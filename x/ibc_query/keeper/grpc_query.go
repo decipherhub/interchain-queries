@@ -37,6 +37,6 @@ func (k Keeper) CrossChainQueryResult(c context.Context, req *types.QueryCrossCh
 		return nil, sdkerrors.ErrNotFound
 	}
 
-	return &types.QueryCrossChainQueryResultResponse{Id: req.Id, Result: queryResult.Result, Data: queryResult.Data}, nil
+	return &types.QueryCrossChainQueryResultResponse{Id: req.Id, Result: queryResult.Result, Data: queryResult.Data, Sender: queryResult.Sender}, nil
 
 }
