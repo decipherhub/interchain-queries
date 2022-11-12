@@ -6,7 +6,6 @@ option go_package = "github.com/cosmos/interchain-queries/x/ibc_query/types";
 
 import "gogoproto/gogo.proto";
 import "ibc/core/client/v1/client.proto";
-import "cosmos/capability/v1beta1/capability.proto";
 import "ibc/applications/ibc_query/v1/crosschainquery.proto";
 import "proofs.proto";
 
@@ -42,7 +41,6 @@ message MsgSubmitCrossChainQuery {
 // MsgSubmitCrossChainQueryResponse
 message MsgSubmitCrossChainQueryResponse {
   string id = 1;
-  string cap_key = 2;
 }
 
 // MsgSubmitCrossChainQueryResult

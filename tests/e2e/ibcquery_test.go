@@ -39,7 +39,7 @@ func (i *IBCQueryTestSuite) TestIBCQueryToBank() {
 
 	queryPath := "http://blockchains:27011/cosmos/bank/v1beta1/balances/" + targetAddr.String()
 	query := testIBCQuery{path: queryPath, sender: senderAddr.String()}
-	queryId, _, err := i.sendIBCQuery(query)
+	queryId, err := i.sendIBCQuery(query)
 	if err != nil {
 		i.Require().Fail("fail to send IBC query", err.Error())
 		return

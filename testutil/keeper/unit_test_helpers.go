@@ -50,7 +50,7 @@ func NewInMemKeeperParams(t testing.TB) InMemKeeperParams {
 	)
 
 	ctx := sdk.NewContext(stateStore, tmproto.Header{}, false, log.NewNopLogger())
-	
+
 	return InMemKeeperParams{
 		Cdc:            cdc,
 		StoreKey:       storeKey,
@@ -58,7 +58,6 @@ func NewInMemKeeperParams(t testing.TB) InMemKeeperParams {
 		Ctx:            ctx,
 	}
 }
-
 
 // A struct holding pointers to any mocked external keeper needed for provider/consumer keeper setup.
 type MockedKeepers struct {
@@ -71,13 +70,12 @@ type MockedKeepers struct {
 // NewMockedKeepers instantiates a struct with pointers to properly instantiated mocked keepers.
 func NewMockedKeepers(ctrl *gomock.Controller) MockedKeepers {
 	return MockedKeepers{
-		MockScopedKeeper:      NewMockScopedKeeper(ctrl),
-		MockChannelKeeper:     NewMockChannelKeeper(ctrl),
-		MockPortKeeper:        NewMockPortKeeper(ctrl),
-		MockICS4Wrapper:       NewMockICS4Wrapper(ctrl),
+		MockScopedKeeper:  NewMockScopedKeeper(ctrl),
+		MockChannelKeeper: NewMockChannelKeeper(ctrl),
+		MockPortKeeper:    NewMockPortKeeper(ctrl),
+		MockICS4Wrapper:   NewMockICS4Wrapper(ctrl),
 	}
 }
-
 
 // NewInMemIBCQueryKeeper instantiates an in-mem provider keeper from params and mocked keepers
 func NewInMemIBCQueryKeeper(params InMemKeeperParams, mocks MockedKeepers) ibcquerykeeper.Keeper {
@@ -90,7 +88,6 @@ func NewInMemIBCQueryKeeper(params InMemKeeperParams, mocks MockedKeepers) ibcqu
 		mocks.MockPortKeeper,
 	)
 }
-
 
 // Returns an in-memory provider keeper, context, controller, and mocks, given a test instance and parameters.
 //
@@ -105,11 +102,11 @@ func GetIBCQueryKeeperAndCtx(t *testing.T, params InMemKeeperParams) (
 }
 
 // GetMocksForSubmitCrossChainQuery returns mock expectations needed to call SubmitCrossChainQuery()
-func GetMocksForSubmitCrossChainQuery(ctx sdk.Context, mocks *MockedKeepers, 
+func GetMocksForSubmitCrossChainQuery(ctx sdk.Context, mocks *MockedKeepers,
 	queryId string, senderAddr string) []*gomock.Call {
-	var( errFromNewCap  error )
+	var errFromNewCap error
 	dummyCap := &capabilitytypes.Capability{}
-	return []*gomock.Call{			
+	return []*gomock.Call{
 		mocks.MockScopedKeeper.EXPECT().NewCapability(
 			ctx, types.FormatQueryCapabilityIdentifier(queryId, senderAddr),
 		).Return(dummyCap, errFromNewCap).Times(1),
@@ -117,10 +114,10 @@ func GetMocksForSubmitCrossChainQuery(ctx sdk.Context, mocks *MockedKeepers,
 }
 
 // setUpForCapabilityQueryingChain returns mock expectations needed to call PruneCrossChainQueryResult()
-func GetMocksForPruneCrossChainQueryResult(ctx sdk.Context, mocks *MockedKeepers, 
+func GetMocksForPruneCrossChainQueryResult(ctx sdk.Context, mocks *MockedKeepers,
 	queryId string, senderAddr string) []*gomock.Call {
 	dummyCap := &capabilitytypes.Capability{}
-	return []*gomock.Call{			
+	return []*gomock.Call{
 		mocks.MockScopedKeeper.EXPECT().GetCapability(
 			ctx, types.FormatQueryCapabilityIdentifier(queryId, senderAddr),
 		).Return(dummyCap, true).Times(1),
@@ -140,7 +137,7 @@ func NewQueryId(IBCQueryKeeper ibcquerykeeper.Keeper, ctx sdk.Context) string {
 func NewMsgSubmitCrossChainQueryForTest(ctx sdk.Context, path string, senderAddr string) types.MsgSubmitCrossChainQuery {
 	msg := types.MsgSubmitCrossChainQuery{
 		Path:               path,
-		LocalTimeoutHeight: clienttypes.NewHeight(0, uint64(ctx.BlockHeight() + 50)),
+		LocalTimeoutHeight: clienttypes.NewHeight(0, uint64(ctx.BlockHeight()+50)),
 		LocalTimeoutStamp:  uint64(ctx.BlockTime().UnixNano() + 5000000),
 		QueryHeight:        uint64(ctx.BlockHeight()),
 		ChainId:            "ibc-query",
@@ -152,11 +149,11 @@ func NewMsgSubmitCrossChainQueryForTest(ctx sdk.Context, path string, senderAddr
 // NewMsgSubmitCrossChainQueryResultForTest returns MsgSubmitCrossChainQueryResult
 func NewMsgSubmitCrossChainQueryResultForTest(ctx sdk.Context, queryId string, senderAddr string) types.MsgSubmitCrossChainQueryResult {
 	queryResult := types.MsgSubmitCrossChainQueryResult{
-		Id:           queryId,
-		QueryHeight:  uint64(ctx.BlockHeight()),
-		Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
-		Data:         []byte("test result data"),
-		Sender:       senderAddr,
+		Id:          queryId,
+		QueryHeight: uint64(ctx.BlockHeight()),
+		Result:      types.QueryResult_QUERY_RESULT_SUCCESS,
+		Data:        []byte("test result data"),
+		Sender:      senderAddr,
 	}
 	return queryResult
 }

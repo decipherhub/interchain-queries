@@ -12,13 +12,13 @@ import (
 	"time"
 )
 
-func (i *IBCQueryTestSuite) sendIBCQuery(query testIBCQuery) (queryId string, capKey string, err error) {
+func (i *IBCQueryTestSuite) sendIBCQuery(query testIBCQuery) (queryId string, err error) {
 	msg := types.NewMsgSubmitCrossChainQuery(query.path, clienttypes.NewHeight(0, 0), uint64(time.Now().Add(time.Hour).UnixNano()), 0, i.queriedChain.ChainID, query.sender)
 	resp, err := i.queryingChain.App.(*app.App).IBCQueryKeeper.SubmitCrossChainQuery(i.queryingChain.GetContext(), msg)
 	if err != nil {
-		return "", "", err
+		return "", err
 	}
-	return resp.Id, resp.CapKey, nil
+	return resp.Id, nil
 }
 
 func (i *IBCQueryTestSuite) submitIBCQueryResult(result testIBCQueryResult) error {

@@ -1,3 +1,18 @@
+# Notice
+**[This repository is not maintained now]**
+
+Interchain query require interchain query module in appchain and relayer. This repository is implemented for interchain query module, but not adopted.
+
+But **now we still implement [relayer](https://github.com/validance/ibc-rs)** and that repository is not compatible with this repository.
+
+We archived [relayer](https://github.com/decipherhub/ibc-rs) which is compatbile with this repository. So you can still execute this module for intherchainquery.
+
+**[Not satisfy all requirements from spec]**
+
+This implementation doesn't implement validate query proof.
+
+
+
 # interchainqueries
 **interchainqueries** houses the code for implementing Interchain Query.
 The repo is currently a WIP and targeting v1 of cross chain queries.
@@ -50,7 +65,7 @@ we use these functionalities for testing
 - [helper function](https://github.com/decipherhub/interchain-queries/blob/main/testutil/keeper/unit_test_helpers.go)
 ### End to End (e2e) Tests - only appchain
 Interchain Query doesn't need IBC connection. So **E2E tests doesn't test simulated connection, packet relays, etc**.\
-**It covers only querying chain**. Because Querying to queried chain is implemented in [Relayer](https://github.com/validance/ibc-rs). Just validating status of querying chain in specific scenario.
+**It covers only querying chain**. Because Querying to queried chain is implemented in [Relayer](https://github.com/decipherhub/ibc-rs). Just validating status of querying chain in specific scenario.
 
 **Coverage**
 - Receive cross chain query request & event emit
@@ -80,4 +95,5 @@ please refer to [e2e test repo](https://github.com/validance/cross-chain-query-e
 
 ## Learn more
 
-- [interchainqueries architecture]()
+- [interchainqueries architecture](./docs/architecture.md)
+- [interchainqueries implementation](./docs/implementaion.md)
