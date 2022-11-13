@@ -156,7 +156,7 @@ func NewMsgSubmitCrossChainQueryResultForTest(ctx sdk.Context, queryId string, s
 		QueryHeight:  uint64(ctx.BlockHeight()),
 		Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 		Data:         []byte("test result data"),
-		Sender:       senderAddr,
+		QuerySender:       senderAddr,
 	}
 	return queryResult
 }

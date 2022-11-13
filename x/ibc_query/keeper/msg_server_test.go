@@ -132,7 +132,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 				QueryHeight:  uint64(ctx.BlockHeight()),
 				Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 				Data:         []byte("test result data"),
-				Sender:       senderAddr1.String(),
+				QuerySender:       senderAddr1.String(),
 			},
 			types.CrossChainQueryResult{
 				Id:      "query-0",
@@ -151,7 +151,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 				QueryHeight:  uint64(ctx.BlockHeight()),
 				Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 				Data:         []byte("test result data"),
-				Sender:       senderAddr1.String(),
+				QuerySender:       senderAddr1.String(),
 			},
 			types.CrossChainQueryResult{},
         },
@@ -169,7 +169,7 @@ func TestSubmitCrossChainQueryResult(t *testing.T) {
 				QueryHeight:  uint64(ctx.BlockHeight()),
 				Result:       types.QueryResult_QUERY_RESULT_SUCCESS,
 				Data:         []byte("test result data"),
-				Sender:       senderAddr2.String(),
+				QuerySender:       senderAddr2.String(),
 			},
 			types.CrossChainQueryResult{
 				Id:      "query-1",
