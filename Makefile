@@ -109,8 +109,10 @@ lint:
 	@docker run --rm -v $(CURDIR):/app -w /app golangci/golangci-lint:v1.46.2 golangci-lint run --out-format=tab --timeout=10m
 
 test:
+	@echo "Running unit test"
 	@go test -v ./x/...
-
+	@echo "Running e2e test"
+	@go test -v ./tests/e2e/...
 ###############################################################################
 ###                                Protobuf                                 ###
 ###############################################################################

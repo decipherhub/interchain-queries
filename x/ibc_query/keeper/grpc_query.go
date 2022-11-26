@@ -23,7 +23,6 @@ func (k Keeper) CrossChainQuery(c context.Context, req *types.QueryCrossChainQue
 	}
 
 	return &types.QueryCrossChainQueryResponse{Result: &query}, nil
-
 }
 
 // CrossChainQueryResult implements the Query/CrossChainQueryResult gRPC method
@@ -38,5 +37,4 @@ func (k Keeper) CrossChainQueryResult(c context.Context, req *types.QueryCrossCh
 	}
 
 	return &types.QueryCrossChainQueryResultResponse{Id: req.Id, Result: queryResult.Result, Data: queryResult.Data}, nil
-
 }
