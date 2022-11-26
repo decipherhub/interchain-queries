@@ -73,12 +73,14 @@ func (msg MsgSubmitCrossChainQuery) GetSignBytes() []byte {
 }
 
 // NewMsgSubmitCrossChainQueryResult creates a new instance of NewMsgSubmitCrossChainQueryResult
-func NewMsgSubmitCrossChainQueryResult(id string, queryHeight uint64, result QueryResult, data []byte, proofs []*ics23.ProofSpec) *MsgSubmitCrossChainQueryResult {
+func NewMsgSubmitCrossChainQueryResult(id string, queryHeight uint64, result QueryResult, data []byte, sender string, querySender string, proofs []*ics23.ProofSpec) *MsgSubmitCrossChainQueryResult {
 	return &MsgSubmitCrossChainQueryResult{
 		Id:          id,
 		QueryHeight: queryHeight,
 		Result:      result,
 		Data:        data,
+		Sender:      sender,
+		QuerySender: querySender,
 		ProofSpecs:  proofs,
 	}
 }
