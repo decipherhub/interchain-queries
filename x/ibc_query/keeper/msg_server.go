@@ -3,6 +3,7 @@ package keeper
 import (
 	"context"
 	errorsmod "cosmossdk.io/errors"
+	"fmt"
 
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
@@ -59,9 +60,9 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
 
 	// emit event
-	EmitQueryEvent(ctx, query)
+	EmitQueryEvent(ctx, query, msg.Sender)
 
-	return &types.MsgSubmitCrossChainQueryResponse{Id: query.Id}, nil
+	return &types.MsgSubmitCrossChainQueryResponse{Id: query.Id, CapKey: fmt.Sprint(*queryCapability)}, nil
 }
 
 func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.MsgSubmitCrossChainQueryResult) (*types.MsgSubmitCrossChainQueryResultResponse, error) {
@@ -72,7 +73,7 @@ func (k Keeper) SubmitCrossChainQueryResult(goCtx context.Context, msg *types.Ms
 		Id:     msg.Id,
 		Result: msg.Result,
 		Data:   msg.Data,
-		Sender: msg.Sender,
+		Sender: msg.QuerySender,
 	}
 
 	query, found := k.GetCrossChainQuery(ctx, types.QueryPath(queryResult.Id))

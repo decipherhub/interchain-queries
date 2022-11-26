@@ -15,6 +15,7 @@ const (
 	AttributeKeyQueryHeight = "query_height"
 	AttributeKeyQueryPath   = "query_path"
 	AttributeKeyChainId     = "chain_id"
+	AttributeKeySender      = "sender"
 	AttributeKeyAckSuccess  = "success"
 	AttributeKeyAckError    = "error"
 )

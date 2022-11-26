@@ -41,6 +41,7 @@ message MsgSubmitCrossChainQuery {
 // MsgSubmitCrossChainQueryResponse
 message MsgSubmitCrossChainQueryResponse {
   string id = 1;
+  string cap_key = 2;
 }
 
 // MsgSubmitCrossChainQueryResult
@@ -52,8 +53,9 @@ message MsgSubmitCrossChainQueryResult {
   QueryResult result = 3;
   bytes data = 4;
   string sender = 5;
+  string query_sender = 6;
   repeated ics23.ProofSpec proof_specs =
-      6; // TODO: Proof specifications used in verifying counterparty state
+      7; // TODO: Proof specifications used in verifying counterparty state
 }
 
 // MsgSubmitCrossChainQueryResultResponse

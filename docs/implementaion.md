@@ -110,8 +110,8 @@ So we implement that making capability require both query id and user id.
 
 ### Response doesn't return capability key and request doesn't require capabilitiy 
 
-In spec, ```CrossChainQueryRequest``` return capability key and ```PruneCrossChainQueryResult``` require capability key.` 
-But in our implementation, ```MsgSubmitCrossChainQueryResponse``` doesn't return capability key and ```MsgSubmitPruneCrossChainQueryResult``` doesn't require capability key. 
+In spec, ```CrossChainQueryRequest``` return capability key and ```PruneCrossChainQueryResult``` require capability key. 
+But in our implementation ```MsgSubmitPruneCrossChainQueryResult``` doesn't require capability key. 
 
 ## Proof
 ### We don't implement crosschain query validation
