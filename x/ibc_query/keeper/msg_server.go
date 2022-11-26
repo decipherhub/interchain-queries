@@ -4,7 +4,6 @@ import (
 	"context"
 	errorsmod "cosmossdk.io/errors"
 	"fmt"
-
 	sdk "github.com/cosmos/cosmos-sdk/types"
 	sdkerrors "github.com/cosmos/cosmos-sdk/types/errors"
 	clienttypes "github.com/cosmos/ibc-go/v5/modules/core/02-client/types"
@@ -51,13 +50,13 @@ func (k Keeper) SubmitCrossChainQuery(goCtx context.Context, msg *types.MsgSubmi
 
 	k.SetCrossChainQuery(ctx, types.QueryPath(query.Id), query)
 
-	_, err := k.scopedKeeper.NewCapability(ctx, k.GenerateQueryCapabilityIdentifier(query.Id, msg.Sender))
+	// Log the query request
+	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
+
+	queryCapability, err := k.scopedKeeper.NewCapability(ctx, k.GenerateQueryCapabilityIdentifier(query.Id, msg.Sender))
 	if err != nil {
 		return nil, sdkerrors.Wrapf(err, "could not create capability for query ID %s", query.Id)
 	}
-
-	// Log the query request
-	k.Logger(ctx).Info("query sent", "query_id", query.GetId())
 
 	// emit event
 	EmitQueryEvent(ctx, query, msg.Sender)
